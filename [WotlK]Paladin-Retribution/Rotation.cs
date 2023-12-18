@@ -54,7 +54,7 @@ public class RetPalaWOTLK : Rotation
     }
 }
 
-if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.HasAura("Retribution Aura") && !Api.Player.IsMounted())
+if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.HasPermanent("Retribution Aura") && !Api.Player.IsMounted())
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Retribution Aura");
@@ -65,7 +65,7 @@ if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.HasAura("Retributio
         return true;
     }
 }
-else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.HasAura("Devotion Aura") && !Api.Player.HasAura("Retribution Aura") && !Api.Player.IsMounted())
+else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.HasPermanent("Devotion Aura") && !Api.Player.HasPermanent("Retribution Aura") && !Api.Player.IsMounted())
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Devotion Aura");
@@ -76,7 +76,7 @@ else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.HasAura("Devotion
         return true;
     }
 }
-else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.HasPermanentAura("Crusader Aura") && Api.Player.IsMounted())
+else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.HasPermanent("Crusader Aura") && Api.Player.IsMounted())
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Crusader Aura");
@@ -286,7 +286,7 @@ if (Api.Spellbook.CanCast("Crusader Strike") && mana > 50 && !Api.Spellbook.OnCo
 		
 
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{mana} Mana available");
+        Console.WriteLine($"{mana}% Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
     }
-}
+	    }
