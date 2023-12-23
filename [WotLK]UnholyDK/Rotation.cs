@@ -7,7 +7,6 @@ using wShadow.Warcraft.Managers;
 using wShadow.Warcraft.Structures.Wow_Player;
 using wShadow.Warcraft.Defines.Wow_Player;
 using wShadow.Warcraft.Defines.Wow_Spell;
-using wShadow.Warcraft.Structures.Wow_Auras;
 
 public class UnholyDK : Rotation
 {
@@ -65,7 +64,7 @@ public class UnholyDK : Rotation
             return true;
     }
 	
-	 if (me.HasPermanent("Blood Presence") || me.HasPermanent("Frost Presence"))
+	 if Api.Spellbook.CanCast("Unholy Presence") && me.HasPermanent("Blood Presence") || me.HasPermanent("Frost Presence"))
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Casting Unholy Presence");
@@ -99,7 +98,7 @@ public class UnholyDK : Rotation
 		var target = Api.Target;
 		var targetDistance = target.Position.Distance2D(me.Position);
 		var health = me.HealthPercent;
-		var runicPower = me.GetPower(UnitPower.RunicPower);
+		var runicPower = me.RunicPower;
 			var bloodRunes = Api.BloodRunesReady();
             var unholyRunes = Api.UnholyRunesReady();
             var frostRunes = Api.FrostRunesReady();
@@ -192,7 +191,7 @@ if ((Api.Spellbook.CanCast("Strangulate") || Api.Spellbook.CanCast("Mind Freeze"
 if (Api.Spellbook.CanCast("Icebound Fortitude") && health <= 30 && runicPower >= 20 && !Api.Spellbook.OnCooldown("Icebound Fortitude"))
 {
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"Casting Icebound Fortitude as we have less than {me.Health} Health and enough {me.GetPowerPercent(UnitPower.RunicPower)} Runic Power");
+    Console.WriteLine($"Casting Icebound Fortitude ");
     Console.ResetColor();
 
     if (Api.Spellbook.Cast("Icebound Fortitude"))
@@ -200,10 +199,10 @@ if (Api.Spellbook.CanCast("Icebound Fortitude") && health <= 30 && runicPower >=
 }
 
 
-if (Api.EnemiesNearby(10, true, true) >= 2 && Api.Spellbook.CanCast("Pestilence") && bloodRunes >= 1 || deathRunes>= 1 && target.HasAura("Frost Fever") && target.HasAura("Blood Plague"))
+if (Api.UnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Pestilence") && bloodRunes >= 1 || deathRunes>= 1 && target.HasAura("Frost Fever") && target.HasAura("Blood Plague"))
 {
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"Casting Pestilence r");
+    Console.WriteLine($"Casting Pestilence ");
     Console.ResetColor();
 
     if (Api.Spellbook.Cast("Pestilence"))
@@ -219,7 +218,7 @@ if (Api.Spellbook.CanCast("Death Strike") && health <= 60 && bloodRunes >= 1 && 
     if (Api.Spellbook.Cast("Death Strike")) 
         return true;
 }       
-if (Api.Spellbook.CanCast("Army of the Dead") && !me.IsCasting() && !Api.Spellbook.OnCooldown("Army of the Dead") && Api.EnemiesNearby(10, true, true) >= 2)
+if (Api.Spellbook.CanCast("Army of the Dead") && !me.IsCasting() && !Api.Spellbook.OnCooldown("Army of the Dead") && Api.UnitsNearby(10, true) >= 2)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Casting Army of the Dead");
@@ -229,7 +228,7 @@ if (Api.Spellbook.CanCast("Army of the Dead") && !me.IsCasting() && !Api.Spellbo
         return true;
 }
 
-if (Api.EnemiesNearby(10, true, true) >= 2 && Api.Spellbook.CanCast("Blood Boil") && (bloodRunes >= 1 || deathRunes >= 1))
+if (Api.UnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Blood Boil") && (bloodRunes >= 1 || deathRunes >= 1))
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Casting Blood Boil");
@@ -239,7 +238,7 @@ if (Api.EnemiesNearby(10, true, true) >= 2 && Api.Spellbook.CanCast("Blood Boil"
         return true;
 }
 
-if (Api.Spellbook.CanCast("Summon Gargoyle") && runicPower > 60 && !me.IsCasting() && !Api.Spellbook.OnCooldown("Summon Gargoyle") && Api.EnemiesNearby(10, true, true) >= 2)
+if (Api.Spellbook.CanCast("Summon Gargoyle") && runicPower > 60 && !me.IsCasting() && !Api.Spellbook.OnCooldown("Summon Gargoyle") && Api.UnitsNearby(10, true) >= 2)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Summon Gargoyle");
@@ -248,10 +247,7 @@ if (Api.Spellbook.CanCast("Summon Gargoyle") && runicPower > 60 && !me.IsCasting
     if (Api.Spellbook.Cast("Summon Gargoyle"))
         return true;
 }
-if (Api.EnemiesNearby(10, true, true) >= 2 &&
-    Api.Spellbook.CanCast("Bone Shield") && !me.HasAura("Bone Shield") &&
-    !Api.Spellbook.OnCooldown("Bone Shield") && (unholyRunes>= 1 || deathRunes >= 1) &&
-    runicPower >= 10)
+if (Api.UnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Bone Shield") && !me.HasAura("Bone Shield") &&!Api.Spellbook.OnCooldown("Bone Shield") && (unholyRunes>= 1 || deathRunes >= 1) && runicPower >= 10)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Casting Bone Shield ");
@@ -269,7 +265,7 @@ if (Api.Spellbook.CanCast("Blood Tap") && bloodRunes > 1 && (unholyRunes < 1 || 
     if (Api.Spellbook.Cast("Blood Tap"))
         return true;
 }
-if (Api.Spellbook.CanCast("Unbreakable Armor") && me.HasAura("Unbreakable Armor") && frostRunes >= 1 && runicPower >= 10 && Api.EnemiesNearby(10, true, true) >= 2)
+if (Api.Spellbook.CanCast("Unbreakable Armor") && me.HasAura("Unbreakable Armor") && frostRunes >= 1 && runicPower >= 10 && Api.UnitsNearby(10, true) >= 2)
 {
     
   
@@ -427,14 +423,12 @@ if (Api.Spellbook.CanCast("Icy Touch") && (frostRunes >= 1 || deathRunes >= 1) &
                 Console.WriteLine("No pet found.");
             }
 
-            var runicPower = me.GetPowerPercent(UnitPower.RunicPower);
             var bloodRunes = Api.BloodRunesReady();
             var unholyRunes = Api.UnholyRunesReady();
             var frostRunes = Api.FrostRunesReady();
             var deathRunes = Api.DeathRunesReady();
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{runicPower}% Runic Power available");
             Console.WriteLine($"{bloodRunes} Blood runes available");
             Console.WriteLine($"{unholyRunes} Unholy runes available");
             Console.WriteLine($"{frostRunes} Frost runes available");
