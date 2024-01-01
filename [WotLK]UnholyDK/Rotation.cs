@@ -4,10 +4,6 @@ using wShadow.Templates;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
-using wShadow.Warcraft.Structures.Wow_Player;
-using wShadow.Warcraft.Defines.Wow_Player;
-using wShadow.Warcraft.Defines.Wow_Spell;
-
 public class UnholyDK : Rotation
 {
     private DateTime lastLogTime = DateTime.MinValue;
@@ -33,6 +29,7 @@ public class UnholyDK : Rotation
 	var targetDistance = target.Position.Distance2D(me.Position);
     if (me.IsDead() || me.IsGhost() || me.IsCasting()) return false;
     if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+	ShadowApi shadowApi = new ShadowApi();
 
     LogPlayerStatsPeriodically();
 
@@ -45,7 +42,7 @@ public class UnholyDK : Rotation
         if (Api.Spellbook.Cast("Raise Dead"))
             return true;
     }
-    else if (me.HasItem("Corpse Dust") &&  pet == null && Api.Spellbook.CanCast("Raise Dead"))
+    else if (shadowApi.Inventory.HasItem("Corpse Dust") &&  pet == null && Api.Spellbook.CanCast("Raise Dead"))
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Casting Raise Dead with Corpse Dust as we don't have the glyph.");
@@ -64,7 +61,7 @@ public class UnholyDK : Rotation
             return true;
     }
 	
-	 if Api.Spellbook.CanCast("Unholy Presence") && me.HasPermanent("Blood Presence") || me.HasPermanent("Frost Presence"))
+	 if (Api.Spellbook.CanCast("Unholy Presence") && me.HasPermanent("Blood Presence") || me.HasPermanent("Frost Presence"))
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Casting Unholy Presence");
@@ -104,7 +101,8 @@ public class UnholyDK : Rotation
             var frostRunes = Api.FrostRunesReady();
             var deathRunes = Api.DeathRunesReady();
         if (!me.IsValid() || me.IsDeadOrGhost()) return false;
-    
+    	ShadowApi shadowApi = new ShadowApi();
+
 
         
         if (!target.IsValid() || target.IsDeadOrGhost()) return false;
@@ -118,7 +116,7 @@ public class UnholyDK : Rotation
         if (Api.Spellbook.Cast("Raise Dead"))
             return true;
     }
-    else if (me.HasItem("Corpse Dust") &&  pet == null && Api.Spellbook.CanCast("Raise Dead"))
+    else if (shadowApi.Inventory.HasItem("Corpse Dust") &&  pet == null && Api.Spellbook.CanCast("Raise Dead"))
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Casting Raise Dead with Corpse Dust as we don't have the glyph.");
