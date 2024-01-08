@@ -62,6 +62,32 @@ ShadowApi shadowApi = new ShadowApi();
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() ) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
+
+	string[] waterTypes = { "Conjured Mana Strudel","Conjured Mountain Spring Water","Conjured Crystal Water","Conjured Sparkling Water","Conjured Mineral Water","Conjured Spring Water","Conjured Purified Water","Conjured Fresh Water", "Conjured Water" };
+string[] foodTypes = { "Conjured Mana Strudel","Conjured Cinnamon Roll","Conjured Sweet Roll","Conjured Sourdough","Conjured Pumpernickel","Conjured Rye","Conjured Bread","Conjured Muffin" };
+
+bool needsWater = true;
+bool needsFood = true;
+foreach (string waterType in waterTypes)
+{
+    if (shadowApi.Inventory.HasItem(waterType))
+    {
+        needsWater = false;
+        break;
+    }
+}
+
+foreach (string foodType in foodTypes)
+{
+    if (shadowApi.Inventory.HasItem(foodType))
+    {
+        needsFood = false;
+        break;
+    }
+}
+
+
+		
 		if (Api.Spellbook.CanCast("Conjure Refreshment") && (needsWater || needsFood))
     {
         if (Api.Spellbook.Cast("Conjure Refreshment"))
@@ -106,28 +132,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
     if (Api.Spellbook.Cast("Arcane Intellect"))
         return true;
 	}
-	bool needsWater = true;
-	string[] waterTypes = { "Conjured Mana Strudel","Conjured Mountain Spring Water","Conjured Crystal Water","Conjured Sparkling Water","Conjured Mineral Water","Conjured Spring Water","Conjured Purified Water","Conjured Fresh Water", "Conjured Water" };
-
-foreach (string waterType in waterTypes)
-{
-    if (shadowApi.Inventory.HasItem(waterType))
-    {
-        needsWater = false;
-        break;
-    }
-}
-string[] foodTypes = { "Conjured Mana Strudel","Conjured Cinnamon Roll","Conjured Sweet Roll","Conjured Sourdough","Conjured Pumpernickel","Conjured Rye","Conjured Bread","Conjured Muffin" };
-bool needsFood = true;
-
-foreach (string foodType in foodTypes)
-{
-    if (shadowApi.Inventory.HasItem(foodType))
-    {
-        needsFood = false;
-        break;
-    }
-}
+	
 
 	
 
@@ -178,7 +183,7 @@ if (needsFood)
 	
 	if (!target.IsDead())
 
-if (Api.Spellbook.CanCast("Frostbolt")  &&  mana > 20)
+if (Api.Spellbook.CanCast("Fireball")  &&  mana > 20)
   
     {
         var reaction = me.GetReaction(target);
@@ -186,10 +191,10 @@ if (Api.Spellbook.CanCast("Frostbolt")  &&  mana > 20)
         if (reaction != UnitReaction.Friendly)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Frostbolt");
+            Console.WriteLine("Casting Fireball");
             Console.ResetColor();
             
-            if (Api.Spellbook.Cast("Frostbolt"))
+            if (Api.Spellbook.Cast("Fireball"))
             {
                 return true;
             }
@@ -197,13 +202,13 @@ if (Api.Spellbook.CanCast("Frostbolt")  &&  mana > 20)
         else
         {
             // Handle if the target is friendly
-            Console.WriteLine("Target is friendly. Skipping Frostbolt cast.");
+            Console.WriteLine("Target is friendly. Skipping Fireball cast.");
         }
     }
     else
     {
         // Handle if the target is not valid
-        Console.WriteLine("Invalid target. Skipping Frostbolt cast.");
+        Console.WriteLine("Invalid target. Skipping Fireball cast.");
     }
 				return base.PassivePulse();
 
@@ -236,6 +241,15 @@ var targethealth = target.HealthPercent;
 		
 	if (Api.Player.InCombat() && Api.Target != null && Api.Target.IsValid())
 		{
+				if (Api.Spellbook.CanCast("Mana Shield") && !Api.Spellbook.OnCooldown("Mana Shield") && healthPercentage<=30)
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Mana Shield");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Mana Shield"))
+        return true;
+	}
 			if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion"))
 	{
     Console.ForegroundColor = ConsoleColor.Green;
