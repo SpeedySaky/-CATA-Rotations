@@ -80,7 +80,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
     if (Api.Spellbook.Cast("Frost Armor"))
         return true;
 	}
-		if (Api.Spellbook.CanCast("Amplify Magic")  && !me.HasAura("Amplify Magic") 
+		if (Api.Spellbook.CanCast("Amplify Magic")  && !me.HasAura("Amplify Magic")) 
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Amplify Magic");
@@ -244,7 +244,8 @@ var targethealth = target.HealthPercent;
     if (Api.Spellbook.Cast("Combustion"))
         return true;
 	}
-	f (Api.Spellbook.CanCast("Mirror Image") && !Api.Spellbook.OnCooldown("Mirror Image") && mana>=10)
+	
+	if (Api.Spellbook.CanCast("Mirror Image") && !Api.Spellbook.OnCooldown("Mirror Image") && mana>=10)
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Mirror Image");
@@ -266,6 +267,7 @@ var targethealth = target.HealthPercent;
     if (Api.Spellbook.Cast("Living Bomb"))
         return true;
 	}
+	
 	if (me.HasAura("Hot Streak") && mana>=22 && !target.HasAura("Pyroblast") && targethealth>=20)
 	{
 		Console.ForegroundColor = ConsoleColor.Green;
