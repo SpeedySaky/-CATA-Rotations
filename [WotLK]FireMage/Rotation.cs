@@ -62,6 +62,14 @@ ShadowApi shadowApi = new ShadowApi();
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() ) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
+		if (Api.Spellbook.CanCast("Conjure Refreshment") && (needsWater || needsFood))
+    {
+        if (Api.Spellbook.Cast("Conjure Refreshment"))
+        {
+            Console.WriteLine("Conjured Refreshment.");
+            // Add further actions if needed after conjuring water
+        }
+ }
 		if (Api.Spellbook.CanCast("Mage Armor")  && !me.HasAura("Mage Armor"))
 	{
     Console.ForegroundColor = ConsoleColor.Green;
@@ -121,14 +129,7 @@ foreach (string foodType in foodTypes)
     }
 }
 
-	if (Api.Spellbook.CanCast("Conjure Refreshment") && (needsWater || needsFood))
-    {
-        if (Api.Spellbook.Cast("Conjure Refreshment"))
-        {
-            Console.WriteLine("Conjured Refreshment.");
-            // Add further actions if needed after conjuring water
-        }
- }
+	
 
 
 // Now needsWater variable will indicate if the character needs water
