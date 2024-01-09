@@ -114,7 +114,7 @@ foreach (string foodType in foodTypes)
     if (Api.Spellbook.Cast("Frost Armor"))
         return true;
 	}
-		if (Api.Spellbook.CanCast("Amplify Magic")  && !me.HasAura("Amplify Magic")) 
+		if (Api.Spellbook.CanCast("Amplify Magic")  && (!me.HasAura(43017) ||  !me.HasPermanent(43017)) 
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Amplify Magic");
@@ -250,15 +250,7 @@ var targethealth = target.HealthPercent;
     if (Api.Spellbook.Cast("Mana Shield"))
         return true;
 	}
-			if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion"))
-	{
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Combustion");
-    Console.ResetColor();
-
-    if (Api.Spellbook.Cast("Combustion"))
-        return true;
-	}
+	
 	
 	if (Api.Spellbook.CanCast("Mirror Image") && !Api.Spellbook.OnCooldown("Mirror Image") && mana>=10)
 	{
@@ -273,6 +265,15 @@ var targethealth = target.HealthPercent;
     // Single Target Abilities
     if (!target.IsDead())
     {
+				if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") && !me.HasPermanent(28682))
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Combustion");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Combustion"))
+        return true;
+	}
 		if (Api.Spellbook.CanCast("Living Bomb") && mana>=22 && !target.HasAura("Living Bomb") && targethealth>=30  && !Api.Spellbook.OnCooldown("Living Bomb"))
 	{
     Console.ForegroundColor = ConsoleColor.Green;

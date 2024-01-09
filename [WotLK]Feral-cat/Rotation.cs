@@ -39,7 +39,7 @@ public class CatDruid : Rotation
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
         var haste = UnitRating.HasteRanged;
-        SlowTick = 600;
+        SlowTick = 800;
         FastTick = 200;
 
         // You can also use this method to add to various action lists.
@@ -60,9 +60,8 @@ public class CatDruid : Rotation
     {
         var me = Api.Player;
         var health = me.HealthPercent;
-        if (me.IsMounted()) return false;
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted()) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.HasPermanent("Swift Flight Form") || me.HasPermanent("Flight Form") || me.HasPermanent("Travel Form")) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
@@ -328,7 +327,16 @@ public class CatDruid : Rotation
             Console.ResetColor();
         }
 
-        if (me.HasPermanent("Cat Form"))
+		if (me.HasPermanent("Travel Form"))
+            Console.WriteLine($"We are in Travel Form");
+        else Console.WriteLine($"We are not in Travel Form");
+		if (me.HasPermanent("Swift Flight Form"))
+            Console.WriteLine($"We are in Swift Flight Form");
+		        else Console.WriteLine($"We are not in Travel Form");
+if (me.HasPermanent("Flight Form"))
+            Console.WriteLine($"We are in Flight Form");
+		        else Console.WriteLine($"We are not in Travel Form");
+		       if (me.HasPermanent("Cat Form"))
             Console.WriteLine($"We are in Cat Form");
         else Console.WriteLine($"We are not in Cat Form");
         
