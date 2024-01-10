@@ -9,7 +9,8 @@ using wShadow.Warcraft.Managers;
 
 public class FireMageWotlk: Rotation
 {
-	
+private bool HasItem(object item)
+        => Api.Inventory.HasItem(item);
  private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
 	
@@ -85,9 +86,25 @@ foreach (string foodType in foodTypes)
         break;
     }
 }
+string[] GemTypes = { "Mana Agate", "Mana Sapphire", "Mana Emerald", "Mana Ruby", "Mana Citrine", "Mana Jade" };
+bool needsgem = true;
 
-
-		
+foreach (string gemType in GemTypes)
+{
+    if (shadowApi.Inventory.HasItem(gemType))
+    {
+        needsgem = false;
+        break;
+       }
+}
+	if (Api.Spellbook.CanCast("Conjure Mana Gem") && needsgem)
+    {
+        if (Api.Spellbook.Cast("Conjure Mana Gem"))
+        {
+            Console.WriteLine("Conjure Mana Gem.");
+            // Add further actions if needed after conjuring water
+        }
+ }	
 		if (Api.Spellbook.CanCast("Conjure Refreshment") && (needsWater || needsFood))
     {
         if (Api.Spellbook.Cast("Conjure Refreshment"))
@@ -114,7 +131,7 @@ foreach (string foodType in foodTypes)
     if (Api.Spellbook.Cast("Frost Armor"))
         return true;
 	}
-		if (Api.Spellbook.CanCast("Amplify Magic")  && (!me.HasAura(43017) ||  !me.HasPermanent(43017)) 
+		if (Api.Spellbook.CanCast("Amplify Magic")  && !me.HasAura("Amplify Magic")) 
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Amplify Magic");
@@ -183,7 +200,7 @@ if (needsFood)
 	
 	if (!target.IsDead())
 
-if (Api.Spellbook.CanCast("Fireball")  &&  mana > 20)
+if (Api.Spellbook.CanCast("Fire Blast")  &&  mana > 20)
   
     {
         var reaction = me.GetReaction(target);
@@ -191,10 +208,10 @@ if (Api.Spellbook.CanCast("Fireball")  &&  mana > 20)
         if (reaction != UnitReaction.Friendly)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Fireball");
+            Console.WriteLine("Casting Fire Blast");
             Console.ResetColor();
             
-            if (Api.Spellbook.Cast("Fireball"))
+            if (Api.Spellbook.Cast("Fire Blast"))
             {
                 return true;
             }
@@ -202,13 +219,13 @@ if (Api.Spellbook.CanCast("Fireball")  &&  mana > 20)
         else
         {
             // Handle if the target is friendly
-            Console.WriteLine("Target is friendly. Skipping Fireball cast.");
+            Console.WriteLine("Target is friendly. Skipping Fire Blast cast.");
         }
     }
     else
     {
         // Handle if the target is not valid
-        Console.WriteLine("Invalid target. Skipping Fireball cast.");
+        Console.WriteLine("Invalid target. Skipping Fire Blast cast.");
     }
 				return base.PassivePulse();
 
@@ -219,6 +236,8 @@ public override bool CombatPulse()
 	// Variables for player and target instances
 var me = Api.Player;
 var target = Api.Target;
+ShadowApi shadowApi = new ShadowApi();
+
  if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
@@ -230,7 +249,25 @@ var targethealth = target.HealthPercent;
 
 // Power percentages for different resources
 		var mana = me.ManaPercent;
+string[] GemTypes = { "Mana Jade", "Mana Citrine", "Mana Ruby", "Mana Emerald", "Mana Sapphire", "Mana Agate" };
 
+if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
+{
+    foreach (string gem in GemTypes)
+    {
+        if (shadowApi.Inventory.HasItem(gem))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Using Minor Healthstone");
+            Console.ResetColor();
+
+            if (Api.Inventory.Use("Minor Healthstone"))
+            {
+                return true;
+            }
+        }
+    }
+}
 // Target distance from the player
 	var targetDistance = target.Position.Distance2D(me.Position);
 
@@ -252,20 +289,11 @@ var targethealth = target.HealthPercent;
 	}
 	
 	
-	if (Api.Spellbook.CanCast("Mirror Image") && !Api.Spellbook.OnCooldown("Mirror Image") && mana>=10)
-	{
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Mirror Image");
-    Console.ResetColor();
-
-    if (Api.Spellbook.Cast("Mirror Image"))
-        return true;
-	}
-
-    // Single Target Abilities
+	// Single Target Abilities
     if (!target.IsDead())
     {
-				if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") && !me.HasPermanent(28682))
+				
+	if (Api.Spellbook.CanCast("Combustion") && !me.HasPermanent(28682) && !Api.Spellbook.OnCooldown("Combustion"))
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Combustion");
@@ -392,9 +420,34 @@ Console.ResetColor();
     Console.WriteLine($"Remaining time for Frost Armor: {roundedMinutes} minutes");
 	Console.ResetColor();
 	}
+	if (me.HasPassive(28682)) // Replace "Thorns" with the actual aura name
+	{
+		 Console.ForegroundColor = ConsoleColor.Blue;
+Console.ResetColor();
+   
+
+    Console.WriteLine($"Have Combustion Passive");
+	Console.ResetColor();
+	}
+	if (me.HasAura(28682)) // Replace "Thorns" with the actual aura name
+	{
+		 Console.ForegroundColor = ConsoleColor.Blue;
+Console.ResetColor();
+   
+
+    Console.WriteLine($"Have Combustion Aura");
+	Console.ResetColor();
+	}
+	if (me.HasPermanent(28682)) // Replace "Thorns" with the actual aura name
+	{
+		 Console.ForegroundColor = ConsoleColor.Blue;
+Console.ResetColor();
+   
+
+    Console.WriteLine($"Have Combustion HasPermanent");
+	Console.ResetColor();
+	}
 	
-
-
 // Define food and water types
 	string[] waterTypes = { "Conjured Mana Strudel","Conjured Mountain Spring Water","Conjured Crystal Water","Conjured Sparkling Water","Conjured Mineral Water","Conjured Spring Water","Conjured Purified Water","Conjured Fresh Water", "Conjured Water" };
 string[] foodTypes = { "Conjured Mana Strudel","Conjured Cinnamon Roll","Conjured Sweet Roll","Conjured Sourdough","Conjured Pumpernickel","Conjured Rye","Conjured Bread","Conjured Muffin" };
