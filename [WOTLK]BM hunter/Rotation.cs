@@ -10,7 +10,7 @@ using wShadow.Warcraft.Managers;
 public class BMhunterWOTLK : Rotation
 {
 	
-    private int debugInterval = 5; // Set the debug interval in seconds
+    private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     private DateTime lastCallPetTime = DateTime.MinValue;
 	private TimeSpan callPetCooldown = TimeSpan.FromSeconds(10);
@@ -74,7 +74,7 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 
 // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsMounted()) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsMounted() || !me.IsFlying()) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
 		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.HasPermanent("Aspect of the Cheetah") )
@@ -89,7 +89,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
 					return true;
 						
 					}
-	if (Api.Spellbook.CanCast("Call Pet")  && (DateTime.Now - lastCallPetTime) >= callPetCooldown)
+	if (!IsValid(pet) &&Api.Spellbook.CanCast("Call Pet")  && (DateTime.Now - lastCallPetTime) >= callPetCooldown)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Call Pet.");
@@ -103,7 +103,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
 }
 
 // Additional actions for when the pet is dead
-else if (pet.IsDead() && Api.Spellbook.CanCast("Revive Pet"))
+else if (!IsValid(pet) && Api.Spellbook.CanCast("Revive Pet"))
 {
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.WriteLine("Casting Revive Pet");
@@ -114,7 +114,7 @@ else if (pet.IsDead() && Api.Spellbook.CanCast("Revive Pet"))
         return true;
     }
  }
- if (!pet.IsDead() && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.HasAura("Mend Pet") && mana >10 )
+ if (IsValid(pet) && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.HasAura("Mend Pet") && mana >10 )
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Pet health is low healing him");
@@ -166,16 +166,7 @@ if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of t
 		            Console.ResetColor();
 
     }     
-	if (Api.Spellbook.CanCast("Serpent Sting") && target.HasAura("Hunter's Mark") && healthPercentage > 50 &&  mana > 20)
-{
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Serpent Sting");
-    Console.ResetColor();
-
-    if (Api.Spellbook.Cast("Serpent Sting"))
-        return true;
-	}
-				return base.PassivePulse();
+					return base.PassivePulse();
 
 				}
 		
@@ -206,7 +197,7 @@ var pet = me.Pet();
 // Target distance from the player
         var TargetDistance = Target.Position.Distance2D(Player.Position);
 
-if (meTarget == null || target.IsDead())
+if (IsValid(pet) && (meTarget == null || target.IsDead()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Assist Pet");
@@ -292,13 +283,24 @@ if (meTarget == null || target.IsDead())
             }
         }
 		
-		 if (Api.Spellbook.CanCast("Kill Command") && !pet.IsDead())
+		 if (Api.Spellbook.CanCast("Kill Command") && IsValid(pet))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Kill Command");
             Console.ResetColor();
 
             if (Api.Spellbook.Cast("Kill Command"))
+            {
+                return true;
+            }
+        }
+		 if (Api.Spellbook.CanCast("Intimidation") && IsValid(pet) && (target.IsCasting() || target.IsChanneling())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Intimidation");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Intimidation"))
             {
                 return true;
             }
