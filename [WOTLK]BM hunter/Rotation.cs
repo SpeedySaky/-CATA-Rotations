@@ -74,10 +74,10 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 
 // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsMounted() || !me.IsFlying()) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsFlying()) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
-		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.HasPermanent("Aspect of the Cheetah") )
+		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.HasPermanent("Aspect of the Cheetah") && !me.IsMounted() )
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -123,7 +123,7 @@ else if (!IsValid(pet) && Api.Spellbook.CanCast("Revive Pet"))
             
                 return true;
 }
-if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of the Hawk") && !me.IsMounted() )
+if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of the Hawk") && !me.IsMounted()  && !me.HasPermanent("Aspect of the Cheetah"))
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
