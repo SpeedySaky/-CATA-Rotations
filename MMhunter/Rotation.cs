@@ -297,10 +297,7 @@ else if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.HasPermanent("Aspe
 					}					
 if (Api.Spellbook.CanCast("Hunter's Mark") &&!target.HasAura("Hunter's Mark") && Api.HasMacro("Mark") )
   
-    {
-        var reaction = me.GetReaction(target);
         
-        if (reaction != UnitReaction.Friendly)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Mark");
@@ -310,7 +307,7 @@ if (Api.Spellbook.CanCast("Hunter's Mark") &&!target.HasAura("Hunter's Mark") &&
             
                 return true;
             }
-        }
+        
 		if (PetHealth <= 30  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.HasAura("Mend Pet") && mana >20 )
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
