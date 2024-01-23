@@ -208,8 +208,6 @@ public class ZerkWarr : Rotation
                     return true;
                 }
             }
-
-
             if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.HasAura("Demoralizing Shout") && rage >= 10 && targethealth >= 30 && Api.UnitsNearby(10, true) >= 1 && rage >= 30)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -238,7 +236,6 @@ public class ZerkWarr : Rotation
                     return true;
                 }
             }
-
             if (Api.Spellbook.CanCast("Whirlwind") && !Api.Spellbook.OnCooldown("Whirlwind") && rage >= 25)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -296,6 +293,81 @@ public class ZerkWarr : Rotation
         }
         if (Api.UnitsNearby(5, true) >= 2)
         {
+            if (Api.Spellbook.CanCast("Battle Shout") && !me.HasAura("Battle Shout") && rage >= 15)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Battle Shout");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Battle Shout"))
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 15)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Pummel");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Pummel"))
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Rend") && !target.HasAura("Rend") && rage >= 15)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Rend");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Rend"))
+                    return true;
+            }
+            if (healthPercentage >= 80 && Api.Spellbook.CanCast("Bloodrage") && !Api.Spellbook.OnCooldown("Bloodrage")) //Last Stand and Shield wall
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Bloodrage");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Bloodrage"))
+                {
+                    return true;
+                }
+            }
+            if (healthPercentage >= 30 && Api.Spellbook.CanCast("Death Wish") && !Api.Spellbook.OnCooldown("Death Wish")) //Last Stand and Shield wall
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Death Wish");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Death Wish"))
+                {
+                    return true;
+                }
+            }
+            if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.HasAura("Demoralizing Shout") && rage >= 10 && targethealth >= 30 && Api.UnitsNearby(10, true) >= 1 && rage >= 30)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Demoralizing Shout");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Demoralizing Shout"))
+
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Thunder Clap") && !target.HasAura("Thunder Clap") && rage >= 20 && targethealth >= 30)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Thunder Clap");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Thunder Clap"))
+
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness")) //Last Stand and Shield wall
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Recklessness");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Recklessness"))
+                {
+                    return true;
+                }
+            }
             if (Api.Spellbook.CanCast("Whirlwind") && !Api.Spellbook.OnCooldown("Whirlwind") && rage >= 25)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -320,6 +392,15 @@ public class ZerkWarr : Rotation
                 Console.WriteLine("Casting Execute");
                 Console.ResetColor();
                 if (Api.Spellbook.Cast("Execute"))
+
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Heroic Strike") && !Api.Spellbook.OnCooldown("Heroic Strike") && rage >= 15)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Heroic Strike");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Heroic Strike"))
 
                     return true;
             }
