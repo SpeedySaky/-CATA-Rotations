@@ -263,7 +263,7 @@ public class ZerkWarr : Rotation
 
                     return true;
             }
-            if (Api.Spellbook.CanCast("Execute") && !Api.Spellbook.OnCooldown("Execute") && rage >= 15 && targethealth <= 25)
+            if (Api.Spellbook.CanCast("Execute") && !Api.Spellbook.OnCooldown("Execute") && rage >= 15 && targethealth <= 20)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Execute");
@@ -386,7 +386,7 @@ public class ZerkWarr : Rotation
                 if (Api.Spellbook.Cast("Cleave"))
                     return true;
             }
-            if (Api.Spellbook.CanCast("Execute") && !Api.Spellbook.OnCooldown("Execute") && rage >= 15 && targethealth <= 25)
+            if (Api.Spellbook.CanCast("Execute") && !Api.Spellbook.OnCooldown("Execute") && rage >= 15 && targethealth <= 20)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Execute");
