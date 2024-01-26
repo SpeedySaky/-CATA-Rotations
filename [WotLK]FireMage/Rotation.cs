@@ -236,7 +236,6 @@ public override bool CombatPulse()
 	// Variables for player and target instances
 var me = Api.Player;
 var target = Api.Target;
-ShadowApi shadowApi = new ShadowApi();
 
  if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -258,10 +257,10 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
         if (shadowApi.Inventory.HasItem(gem))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Using Minor Healthstone");
+            Console.WriteLine("Using gem");
             Console.ResetColor();
 
-            if (Api.Inventory.Use("Minor Healthstone"))
+            if (Api.Inventory.Use(gem))
             {
                 return true;
             }
@@ -276,8 +275,7 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
 		
 		
 		
-	if (Api.Player.InCombat() && Api.Target != null && Api.Target.IsValid())
-		{
+		
 				if (Api.Spellbook.CanCast("Mana Shield") && !Api.Spellbook.OnCooldown("Mana Shield") && healthPercentage<=30)
 	{
     Console.ForegroundColor = ConsoleColor.Green;
@@ -289,9 +287,7 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
 	}
 	
 	
-	// Single Target Abilities
-    if (!target.IsDead())
-    {
+    
 				
 	if (Api.Spellbook.CanCast("Combustion") && !me.HasPermanent(28682) && !Api.Spellbook.OnCooldown("Combustion"))
 	{
@@ -313,6 +309,15 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
 	}
 	
 	if (me.HasAura("Hot Streak") && mana>=22 && !target.HasAura("Pyroblast") && targethealth>=20)
+	{
+		Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Pyroblast");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Pyroblast"))
+        return true;
+	}
+	if (mana>=22 && !target.HasAura("Pyroblast") && targethealth>=20)
 	{
 		Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Pyroblast");
@@ -359,31 +364,12 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
     if (Api.Spellbook.Cast("Shoot"))
         return true;
 	}
-    }
+    
 	
-	}
+	
 
 // Check if in combat and if there are multiple targets nearby
-if (me.InCombat() && Api.UnfriendlyUnitsNearby(10, true) >= 2)
-{
-    
-    // Multi-Target Abilities
-    
-    if (!target.IsDead())
-        {
-            // Logic for multi-target abilities, e.g. AoE spells, debuffs, etc.
-            // Example: if (me.CanCast("AoE_Spell") && target.Distance < 8)
-            // {
-            //     me.Cast("AoE_Spell");
-            // }
-        }
-    
 
-		
-			
-    	
-	
-    }
 
 return base.CombatPulse();
 }
