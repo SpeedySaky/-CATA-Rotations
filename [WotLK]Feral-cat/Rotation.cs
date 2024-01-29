@@ -80,16 +80,7 @@ public class CatDruid : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Gift of the Wild") && HasItem("Wild Spineleaf"))
-        {
-            if (!me.HasAura("Gift of the Wild"))
-            {
-                Print($"Casting Gift of the Wild", ConsoleColor.Green);
-                if (Api.Spellbook.Cast("Gift of the Wild"))
-                    return true;
-            }
-        }
-        else if (Api.Spellbook.CanCast("Mark of the Wild") && !HasItem("Wild Spineleaf"))
+       if (Api.Spellbook.CanCast("Mark of the Wild"))
         {
             if (!me.HasAura("Mark of the Wild"))
             {
