@@ -249,29 +249,26 @@ var targethealth = target.HealthPercent;
 
 // Power percentages for different resources
 		var mana = me.ManaPercent;
-string[] GemTypes = { "Mana Jade", "Mana Citrine", "Mana Ruby", "Mana Emerald", "Mana Sapphire", "Mana Agate" };
+        string[] GemTypes = { "Mana Jade", "Mana Citrine", "Mana Ruby", "Mana Emerald", "Mana Sapphire", "Mana Agate" };
 
-if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
-{
-    foreach (string gem in GemTypes)
-    {
-        if (shadowApi.Inventory.HasItem(gem))
+        foreach (string gem in GemTypes)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Using Minor Healthstone");
-            Console.ResetColor();
-
-            if (Api.Inventory.Use("Minor Healthstone"))
+            if (mana <= 50 && !Api.Inventory.OnCooldown(gem) && shadowApi.Inventory.HasItem(gem))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Using {gem} for mana");
+                Console.ResetColor();
+
+                if (Api.Inventory.Use(gem))
+                {
+                    return true;
+                }
             }
         }
-    }
-}
-// Target distance from the player
-	var targetDistance = target.Position.Distance2D(me.Position);
+        // Target distance from the player
+        var targetDistance = target.Position.Distance2D(me.Position);
 
-		if (me.IsDead() || me.IsGhost() || me.IsCasting()  ) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling()) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
 		
@@ -287,13 +284,29 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
     if (Api.Spellbook.Cast("Mana Shield"))
         return true;
 	}
-	
-	
-	// Single Target Abilities
-    if (!target.IsDead())
-    {
-				
-	if (Api.Spellbook.CanCast("Combustion") && !me.HasPermanent(28682) && !Api.Spellbook.OnCooldown("Combustion"))
+            if (Api.Spellbook.CanCast("Evocation") && !Api.Spellbook.OnCooldown("Evocation") && mana <= 30)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Evocation");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Evocation"))
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Counterspell") && !Api.Spellbook.OnCooldown("Counterspell") && (target.IsCasting() || target.IsChanneling()))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Counterspell");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Counterspell"))
+                {
+                    return true;
+                }
+            }
+            // Single Target Abilities
+
+
+            if (Api.Spellbook.CanCast("Combustion") && !me.HasPermanent(28682) && !Api.Spellbook.OnCooldown("Combustion"))
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Combustion");
@@ -359,7 +372,7 @@ if (me.Mana <= 30 && !Api.Inventory.OnCooldown(GemTypes))
     if (Api.Spellbook.Cast("Shoot"))
         return true;
 	}
-    }
+    
 	
 	}
 
@@ -393,7 +406,6 @@ private void LogPlayerStats()
 var me = Api.Player;
 var target = Api.Target;
 		var mana = me.ManaPercent;
-ShadowApi shadowApi = new ShadowApi();
 
 // Health percentage of the player
 var healthPercentage = me.HealthPercent;
@@ -447,9 +459,10 @@ Console.ResetColor();
     Console.WriteLine($"Have Combustion HasPermanent");
 	Console.ResetColor();
 	}
-	
-// Define food and water types
-	string[] waterTypes = { "Conjured Mana Strudel","Conjured Mountain Spring Water","Conjured Crystal Water","Conjured Sparkling Water","Conjured Mineral Water","Conjured Spring Water","Conjured Purified Water","Conjured Fresh Water", "Conjured Water" };
+        ShadowApi shadowApi = new ShadowApi();
+
+        // Define food and water types
+        string[] waterTypes = { "Conjured Mana Strudel","Conjured Mountain Spring Water","Conjured Crystal Water","Conjured Sparkling Water","Conjured Mineral Water","Conjured Spring Water","Conjured Purified Water","Conjured Fresh Water", "Conjured Water" };
 string[] foodTypes = { "Conjured Mana Strudel","Conjured Cinnamon Roll","Conjured Sweet Roll","Conjured Sourdough","Conjured Pumpernickel","Conjured Rye","Conjured Bread","Conjured Muffin" };
 
 // Count food items in the inventory
