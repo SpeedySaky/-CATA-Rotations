@@ -60,7 +60,7 @@ var mana = me.ManaPercent;
 var targetDistance = target.Position.Distance2D(me.Position);
 ShadowApi shadowApi = new ShadowApi();
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() ) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted()) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
 
