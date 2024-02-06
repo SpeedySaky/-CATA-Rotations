@@ -32,7 +32,7 @@ public class RetPalaWOTLK : Rotation
 		var healthPercentage = me.HealthPercent;
 		var mana = me.Mana;
 
-		if (me.IsDead() || me.IsGhost() || me.IsCasting() ) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted()) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
 		if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
