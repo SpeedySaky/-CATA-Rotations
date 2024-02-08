@@ -12,7 +12,14 @@ public class DestroLockWOTLK : Rotation
 	
     private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
-    
+    public bool IsValid(WowUnit unit)
+	{
+		if (unit == null || unit.Address == null)
+		{
+			return false;
+		}
+		return true;
+	}
     public override void Initialize()
     {  
 	// Can set min/max levels required for this rotation.
@@ -50,8 +57,16 @@ var target = Api.Target;
 var pet = me.Pet();
 var healthPercentage = me.HealthPercent;
 var targethealth = target.HealthPercent;
-var PetHealth = pet.HealthPercent;
-
+	  var PetHealth  = 0.0f;
+	     if(IsValid(pet))
+		 {
+		   PetHealth = pet.HealthPercent;
+		 }  
+		 var TargetHealth  = 0.0f;
+	     if(IsValid(target))
+		 {
+		   TargetHealth = target.HealthPercent;
+		 }
 ShadowApi shadowApi = new ShadowApi();
 
 if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
@@ -65,41 +80,36 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 
 // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() ) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsLooting() ) return false;
         if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 		
 string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
 
-if (shadowApi.Inventory.HasItem("Soul Shard"))
+bool needsHealthstone = true;
+
+foreach (string healthstoneType in healthstoneTypes)
 {
-    bool hasAnyHealthstone = false;
-
-    foreach (string healthstoneType in healthstoneTypes)
+    if (shadowApi.Inventory.HasItem(healthstoneType))
     {
-        if (!shadowApi.Inventory.HasItem(healthstoneType))
-        {
-            hasAnyHealthstone = true;
-            break;
-        }
-    }
-
-    if (!hasAnyHealthstone)
-    {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Create Healthstone ");
-        Console.ResetColor();
-
-        if (Api.Spellbook.HasLearned("Create Healthstone") && Api.Spellbook.CanCast("Create Healthstone"))
-        {
-            if (Api.Spellbook.Cast("Create Healthstone"))
-            {
-                return true;
-            }
-        }
+        needsHealthstone = false;
+        break;
     }
 }
+
+if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.Spellbook.HasLearned("Create Healthstone") && shadowApi.Spellbook.CanCast("Create Healthstone"))
+{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Create Healthstone");
+    Console.ResetColor();
+
+    if (shadowApi.Spellbook.Cast("Create Healthstone"))
+    {
+        return true;
+    }
+}
+
 	
-		if (Api.Spellbook.CanCast("Life Tap") && healthPercentage<80 && mana<30) 
+		if (Api.Spellbook.CanCast("Life Tap") && healthPercentage>80 && mana<30) 
 			{
               Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Life Tap");
@@ -177,21 +187,27 @@ else if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Imp") && !Api.Spellbook.
 } 	
 
 var reaction = me.GetReaction(target);
-	if (Api.Spellbook.CanCast("Shadow Bolt") && reaction != UnitReaction.Friendly && targethealth>=1)
+	if (Api.HasMacro("Combat") && reaction != UnitReaction.Friendly && targethealth>=1)
   
-
+			//macro needed
+			//Macro name : Combat
+			//Macro code:
+			// /cast Curse of Agony
+			// /petattack	
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shadow Bolt");
+            Console.WriteLine("Starting Combat");
             Console.ResetColor();
             
-            if (Api.Spellbook.Cast("Shadow Bolt"))
+            if (Api.UseMacro("Combat"))
             {
                 return true;
             }
         }
         
 				return base.PassivePulse();
+
+		
 
 				}
 		
@@ -200,7 +216,15 @@ public override bool CombatPulse()
 	// Variables for player and target instances
 var me = Api.Player;
 var target = Api.Target;
-var mana = me.Mana;
+		var mana = me.ManaPercent;
+var targethealth = target.HealthPercent;
+var healthPercentage = me.HealthPercent;
+	var targetDistance = target.Position.Distance2D(me.Position);
+
+ShadowApi shadowApi = new ShadowApi();
+
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() ) return false;
+        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
 
  if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -208,106 +232,189 @@ var mana = me.Mana;
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 // Health percentage of the player
-var healthPercentage = me.HealthPercent;
-var targethealth = target.HealthPercent;
 
 
-// Target distance from the player
-	var targetDistance = target.Position.Distance2D(me.Position);
+var pet = me.Pet();
+	  var PetHealth  = 0.0f;
+	     if(IsValid(pet))
+		 {
+		   PetHealth = pet.HealthPercent;
+		 }        	
+		var meTarget = me.Target;
+		  
+        if (meTarget == null || target.IsDead())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Assist Pet");
+            Console.ResetColor();
 
-
-		
-		if (Api.Spellbook.CanCast("Shadowform") && !me.HasPermanent("Shadowform") ) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Shadowform");
+            // Use the Target property to set the player's target to the pet's target
+            if (Api.UseMacro("AssistPet"))
+            {
+                // Successfully assisted the pet, continue rotation
+                // Don't return true here, continue with the rest of the combat logic
+                // without triggering a premature exit
+            }
+        }
+if (Api.Spellbook.CanCast("Drain Soul") && shadowApi.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
+{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Drain Soul");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Shadowform"))
+
+    if (Api.Spellbook.Cast("Drain Soul"))
     {
         return true;
-    } 
+    }
+}
+		string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
+
+
+foreach (string healthstoneType in healthstoneTypes)
+{
+    if (shadowApi.Inventory.HasItem(healthstoneType) && healthPercentage <= 40 && !shadowApi.Inventory.OnCooldown(healthstoneType))
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Using {healthstoneType}");
+        Console.ResetColor();
+
+        if (shadowApi.Inventory.Use(healthstoneType))
+        {
+            return true;
+        }
+    }
+}
+if (meTarget == null || target.IsDead())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Assist Pet");
+            Console.ResetColor();
+
+            // Use the Target property to set the player's target to the pet's target
+            if (Api.UseMacro("AssistPet"))
+            {
+                // Successfully assisted the pet, continue rotation
+                // Don't return true here, continue with the rest of the combat logic
+                // without triggering a premature exit
+            }
+        }
+		 if (PetHealth<50 && healthPercentage>50 && Api.Spellbook.CanCast("Health Funnel"))
+		{
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Healing Pet ");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Health Funnel"))
+                return true;
+        }
+		if (Api.Spellbook.CanCast("Haunt") && !target.HasAura("Haunt") )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Haunt");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Haunt"))
+        return true;
 	}
 	
-	if (Api.Spellbook.CanCast("Power Word: Shield") && !me.HasAura("Power Word: Shield") ) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Power Word: Shield");
+	if (Api.Spellbook.CanCast("Drain Life") && healthPercentage<=50 && mana>=10 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Drain Life");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Power Word: Shield"))
-    {
+
+    if (Api.Spellbook.Cast("Drain Life"))
         return true;
-    } 
-	} 
-	if (Api.Spellbook.CanCast("Shadowfiend") && !Api.Spellbook.OnCooldown("Shadowfiend") ) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Shadowfiend");
+	}
+		
+		if (Api.Spellbook.CanCast("Curse of Agony") && !target.HasAura("Curse of Agony") && targethealth>=30 && mana>=10)
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Curse of Agony");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Shadowfiend"))
-    {
+
+    if (Api.Spellbook.Cast("Curse of Agony"))
         return true;
-    } 
 	}	
-	if (Api.Spellbook.CanCast("Shadow Word: Pain") && !target.HasAura("Shadow Word: Pain") && targethealth>=30) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Shadow Word: Pain");
+			if (Api.Spellbook.CanCast("Corruption") && !target.HasAura("Corruption") && targethealth>=30 && mana>=10)
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Corruption");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Shadow Word: Pain"))
-    {
+
+    if (Api.Spellbook.Cast("Corruption"))
         return true;
-    } 
 	}
-	if (Api.Spellbook.CanCast("Shadow Word: Death") && !target.HasAura("Shadow Word: Death") && targethealth<=10) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Shadow Word: Death");
+	
+	if (Api.Spellbook.CanCast("Unstable Affliction") && !target.HasAura("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.HasAura("Immolate") && targethealth>=30 && mana>=10 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Unstable Affliction");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Shadow Word: Death"))
-    {
+
+    if (Api.Spellbook.Cast("Unstable Affliction"))
         return true;
-    } 
 	}
-if (Api.Spellbook.CanCast("Vampiric Touch") && !target.HasAura("Vampiric Touch") && targethealth>=30) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Vampiric Touch");
+	
+	if (Api.Spellbook.CanCast("Immolate") && !target.HasAura("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.HasAura("Immolate") && targethealth>=30 && mana>=10 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Immolate");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Vampiric Touch"))
-    {
+
+    if (Api.Spellbook.Cast("Immolate"))
         return true;
-    } 
 	}
-if (Api.Spellbook.CanCast("Devouring Plague") && !target.HasAura("Devouring Plague") && targethealth>=30) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Devouring Plague");
+	if (Api.Spellbook.CanCast("Conflagrate") && target.HasAura("Immolate") && targethealth>=40 && mana>=10 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Conflagrate");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Devouring Plague"))
-    {
+
+    if (Api.Spellbook.Cast("Conflagrate"))
         return true;
-    } 
 	}
-if (Api.Spellbook.CanCast("Mind Blast") && targethealth>=30) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Casting Mind Blast");
+	if (Api.Spellbook.CanCast("Shadow Bolt") && me.HasAura(17941)  && mana>=30 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Shadow Bolt");
     Console.ResetColor();
-    if (Api.Spellbook.Cast("Mind Blast"))
-    {
+
+    if (Api.Spellbook.Cast("Shadow Bolt"))
         return true;
-    } 
 	}
-	if (Api.Spellbook.CanCast("Shoot") ) 
-			{
-              Console.ForegroundColor = ConsoleColor.Green;
+	
+	
+	if (Api.Spellbook.CanCast("Soul Fire") && targethealth>=200 && mana>=10 && shadowApi.Inventory.ItemCount("Soul Shard") >= 2 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Soul Fire");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Soul Fire"))
+        return true;
+	}
+	if (Api.Spellbook.CanCast("Shadow Bolt") && targethealth>=30  && mana>=20 )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Casting Shadow Bolt");
+    Console.ResetColor();
+
+    if (Api.Spellbook.Cast("Shadow Bolt"))
+        return true;
+	}
+	
+	if (Api.Spellbook.CanCast("Shoot")   )
+	{
+    Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Shoot");
     Console.ResetColor();
+
     if (Api.Spellbook.Cast("Shoot"))
-    {
         return true;
-    } 
 	}
+    
+		
 return base.CombatPulse();
 }
 private void LogPlayerStats()
@@ -319,6 +426,7 @@ var mana = me.Mana;
 
 // Health percentage of the player
 var healthPercentage = me.HealthPercent;
+ShadowApi shadowApi = new ShadowApi();
 
 
 // Target distance from the player
@@ -331,6 +439,17 @@ var healthPercentage = me.HealthPercent;
 
 		Console.ResetColor();
 
+// Get the current count of Soul Shards in the inventory
+int soulShardCount = shadowApi.Inventory.ItemCount("Soul Shard");
+
+if ( soulShardCount >= 0 )
+{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Current Soul Shard Count: " + soulShardCount); // Debugging line
+    Console.ResetColor();
+
+    
+}
 
 	
 	
