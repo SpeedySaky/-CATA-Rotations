@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using wShadow.Templates;
+using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
@@ -9,8 +10,14 @@ using wShadow.Warcraft.Managers;
 
 public class DestroLockWOTLK : Rotation
 {
-	
-    private int debugInterval = 5; // Set the debug interval in seconds
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    }; private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     public bool IsValid(WowUnit unit)
 	{
@@ -20,11 +27,34 @@ public class DestroLockWOTLK : Rotation
 		}
 		return true;
 	}
+    private bool HasItem(object item)
+        => Api.Inventory.HasItem(item);
     public override void Initialize()
-    {  
-	// Can set min/max levels required for this rotation.
-        
-		 lastDebugTime = DateTime.Now;
+    {
+        //targets 
+        npcConditions.Add("Innkeeper");
+        npcConditions.Add("Auctioneer");
+        npcConditions.Add("Banker");
+        npcConditions.Add("FlightMaster");
+        npcConditions.Add("GuildBanker");
+        npcConditions.Add("PlayerVehicle");
+        npcConditions.Add("StableMaster");
+        npcConditions.Add("Repair");
+        npcConditions.Add("Trainer");
+        npcConditions.Add("TrainerClass");
+        npcConditions.Add("TrainerProfession");
+        npcConditions.Add("Vendor");
+        npcConditions.Add("VendorAmmo");
+        npcConditions.Add("VendorFood");
+        npcConditions.Add("VendorPoison");
+        npcConditions.Add("VendorReagent");
+        npcConditions.Add("WildBattlePet");
+        npcConditions.Add("GarrisonMissionNPC");
+        npcConditions.Add("GarrisonTalentNPC");
+        npcConditions.Add("QuestGiver");
+        // Can set min/max levels required for this rotation.
+
+        lastDebugTime = DateTime.Now;
         LogPlayerStats();
         // Use this method to set your tick speeds.
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
@@ -81,7 +111,7 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 // Target distance from the player
 
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsLooting() ) return false;
-        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 		
 string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
 
@@ -89,20 +119,20 @@ bool needsHealthstone = true;
 
 foreach (string healthstoneType in healthstoneTypes)
 {
-    if (shadowApi.Inventory.HasItem(healthstoneType))
+    if (HasItem(healthstoneType))
     {
         needsHealthstone = false;
         break;
     }
 }
 
-if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.Spellbook.HasLearned("Create Healthstone") && shadowApi.Spellbook.CanCast("Create Healthstone"))
+if (needsHealthstone && HasItem("Soul Shard") && Api.Spellbook.HasLearned("Create Healthstone") && Api.Spellbook.CanCast("Create Healthstone"))
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Create Healthstone");
     Console.ResetColor();
 
-    if (shadowApi.Spellbook.Cast("Create Healthstone"))
+    if (Api.Spellbook.Cast("Create Healthstone"))
     {
         return true;
     }
@@ -119,7 +149,7 @@ if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.S
         return true;
     } 
 	}
-	if (Api.Spellbook.CanCast("Fel Armor") && !me.HasAura("Fel Armor") ) 
+	if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor") ) 
 			{
               Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Fel Armor");
@@ -130,7 +160,7 @@ if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.S
     } 
 	}
 	
-	if (Api.Spellbook.CanCast("Demon Armor") && !me.HasAura("Fel Armor") && !me.HasAura("Demon Armor") ) 
+	if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor") ) 
 			{
               Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Demon Armor");
@@ -141,7 +171,7 @@ if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.S
     } 
 	}
 	
-	if (Api.Spellbook.CanCast("Demon Skin") && !me.HasAura("Fel Armor") && !me.HasAura("Demon Armor") ) 
+	if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor") ) 
 			{
               Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Demon Skin");
@@ -163,7 +193,7 @@ if (needsHealthstone && shadowApi.Inventory.HasItem("Soul Shard") && shadowApi.S
                 return true;
         }
 		
- if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Voidwalker") && shadowApi.Inventory.HasItem("Soul Shard") && mana>30)
+ if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Voidwalker") && HasItem("Soul Shard") && mana>30)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Summon VoidWalker.");
@@ -186,8 +216,7 @@ else if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Imp") && !Api.Spellbook.
     }
 } 	
 
-var reaction = me.GetReaction(target);
-	if (Api.HasMacro("Combat") && reaction != UnitReaction.Friendly && targethealth>=1)
+	if (Api.HasMacro("Combat") && !target.IsDead() && !IsNPC(target))
   
 			//macro needed
 			//Macro name : Combat
@@ -224,7 +253,7 @@ var healthPercentage = me.HealthPercent;
 ShadowApi shadowApi = new ShadowApi();
 
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() ) return false;
-        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
  if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -256,7 +285,7 @@ var pet = me.Pet();
                 // without triggering a premature exit
             }
         }
-if (Api.Spellbook.CanCast("Drain Soul") && shadowApi.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
+if (Api.Spellbook.CanCast("Drain Soul") && ItemCount("Soul Shard") <= 2 && targethealth <= 20)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Drain Soul");
@@ -307,7 +336,7 @@ if (meTarget == null || target.IsDead())
             if (Api.Spellbook.Cast("Health Funnel"))
                 return true;
         }
-		if (Api.Spellbook.CanCast("Haunt") && !target.HasAura("Haunt") )
+		if (Api.Spellbook.CanCast("Haunt") && !target.Auras.Contains("Haunt") )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Haunt");
@@ -327,7 +356,7 @@ if (meTarget == null || target.IsDead())
         return true;
 	}
 		
-		if (Api.Spellbook.CanCast("Curse of Agony") && !target.HasAura("Curse of Agony") && targethealth>=30 && mana>=10)
+		if (Api.Spellbook.CanCast("Curse of Agony") && !target.Auras.Contains("Curse of Agony") && targethealth>=30 && mana>=10)
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Curse of Agony");
@@ -336,7 +365,7 @@ if (meTarget == null || target.IsDead())
     if (Api.Spellbook.Cast("Curse of Agony"))
         return true;
 	}	
-			if (Api.Spellbook.CanCast("Corruption") && !target.HasAura("Corruption") && targethealth>=30 && mana>=10)
+			if (Api.Spellbook.CanCast("Corruption") && !target.Auras.Contains("Corruption") && targethealth>=30 && mana>=10)
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Corruption");
@@ -346,7 +375,7 @@ if (meTarget == null || target.IsDead())
         return true;
 	}
 	
-	if (Api.Spellbook.CanCast("Unstable Affliction") && !target.HasAura("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.HasAura("Immolate") && targethealth>=30 && mana>=10 )
+	if (Api.Spellbook.CanCast("Unstable Affliction") && !target.Auras.Contains("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate") && targethealth>=30 && mana>=10 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Unstable Affliction");
@@ -356,7 +385,7 @@ if (meTarget == null || target.IsDead())
         return true;
 	}
 	
-	if (Api.Spellbook.CanCast("Immolate") && !target.HasAura("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.HasAura("Immolate") && targethealth>=30 && mana>=10 )
+	if (Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate") && targethealth>=30 && mana>=10 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Immolate");
@@ -365,7 +394,7 @@ if (meTarget == null || target.IsDead())
     if (Api.Spellbook.Cast("Immolate"))
         return true;
 	}
-	if (Api.Spellbook.CanCast("Conflagrate") && target.HasAura("Immolate") && targethealth>=40 && mana>=10 )
+	if (Api.Spellbook.CanCast("Conflagrate") && target.Auras.Contains("Immolate") && targethealth>=40 && mana>=10 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Conflagrate");
@@ -374,7 +403,7 @@ if (meTarget == null || target.IsDead())
     if (Api.Spellbook.Cast("Conflagrate"))
         return true;
 	}
-	if (Api.Spellbook.CanCast("Shadow Bolt") && me.HasAura(17941)  && mana>=30 )
+	if (Api.Spellbook.CanCast("Shadow Bolt") && me.Auras.Contains(17941)  && mana>=30 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Shadow Bolt");
@@ -385,7 +414,7 @@ if (meTarget == null || target.IsDead())
 	}
 	
 	
-	if (Api.Spellbook.CanCast("Soul Fire") && targethealth>=200 && mana>=10 && shadowApi.Inventory.ItemCount("Soul Shard") >= 2 )
+	if (Api.Spellbook.CanCast("Soul Fire") && targethealth>=200 && mana>=10 && ItemCount("Soul Shard") >= 2 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Soul Fire");
@@ -426,9 +455,6 @@ var mana = me.Mana;
 
 // Health percentage of the player
 var healthPercentage = me.HealthPercent;
-ShadowApi shadowApi = new ShadowApi();
-
-
 // Target distance from the player
 		var targetDistance = target.Position.Distance2D(me.Position);
 
@@ -440,7 +466,7 @@ ShadowApi shadowApi = new ShadowApi();
 		Console.ResetColor();
 
 // Get the current count of Soul Shards in the inventory
-int soulShardCount = shadowApi.Inventory.ItemCount("Soul Shard");
+int soulShardCount = ItemCount("Soul Shard");
 
 if ( soulShardCount >= 0 )
 {
@@ -456,4 +482,31 @@ if ( soulShardCount >= 0 )
 
 Console.ResetColor();
     }
-	}
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
+
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
+    }
+}

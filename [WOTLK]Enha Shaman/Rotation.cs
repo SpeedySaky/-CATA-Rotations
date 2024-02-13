@@ -1,10 +1,11 @@
 using System;
 using System.Threading;
-using System.Collections.Generic;
 using wShadow.Templates;
+using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
+
 
 
 
@@ -105,7 +106,7 @@ public class EnhaShamanWOTLK : Rotation
         }
 
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsFlying()) return false;
-        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         bool hasFlametongueEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 1");
         bool hasFlametongueEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 2");
         bool hasFlametongueEnchantment3 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 3");
@@ -184,8 +185,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-
-        if (Api.Spellbook.CanCast("Lightning Shield") && !me.HasAura("Lightning Shield") && mana > 30)
+        if (Api.Spellbook.CanCast("Lightning Shield") && !me.Auras.Contains("Lightning Shield") && mana > 30)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Lighting Shield");
@@ -195,7 +195,6 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-
         if ( !target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Lightning Bolt") && healthPercentage > 50 && mana > 20 && targetDistance>25)  
     
         
@@ -210,9 +209,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-       
-        
-        if (Api.Spellbook.CanCast("Totemic Recall") && (me.HasPermanent("Stoneskin") || me.HasPermanent("Windfury Totem")))
+        if (Api.Spellbook.CanCast("Totemic Recall") && (me.Auras.Contains("Stoneskin") || me.Auras.Contains("Windfury Totem")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Totemic Recall");
@@ -222,7 +219,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Stoneskin Totem") && me.HasPermanent("Stoneskin"))
+        if (Api.Spellbook.CanCast("Stoneskin Totem") && me.Auras.Contains("Stoneskin"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Removing Stoneskin Totem");
@@ -232,7 +229,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Windfury Totem") && me.HasPermanent("Windfury Totem"))
+        if (Api.Spellbook.CanCast("Windfury Totem") && me.Auras.Contains("Windfury Totem"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Removing Windfury Totem");
@@ -265,7 +262,7 @@ var healthPercentage = me.HealthPercent;
 
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.HasPermanent("Stoneskin") && mana > 50)
+        if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.Auras.Contains("Stoneskin") && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Stoneskin Totem");
@@ -275,7 +272,7 @@ var healthPercentage = me.HealthPercent;
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Windfury Totem") && !me.HasPermanent("Windfury Totem") && mana > 50)
+        if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem") && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Windfury Totem");
@@ -304,7 +301,7 @@ var healthPercentage = me.HealthPercent;
             }
         }
 
-        if (Api.Spellbook.CanCast("Lightning Shield") && !me.HasAura("Lightning Shield") && mana > 50)
+        if (Api.Spellbook.CanCast("Lightning Shield") && !me.Auras.Contains("Lightning Shield") && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Lighting Shield");
@@ -315,7 +312,7 @@ var healthPercentage = me.HealthPercent;
             }
         }
         else
-        if (Api.Spellbook.CanCast("Mana Shield") && !me.HasAura("Lightning Shield") && mana < 50)
+        if (Api.Spellbook.CanCast("Mana Shield") && !me.Auras.Contains("Lightning Shield") && mana < 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Lighting Shield");
@@ -385,7 +382,7 @@ var healthPercentage = me.HealthPercent;
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Flame Shock") && !Api.Spellbook.OnCooldown("Flame Shock") && !target.HasAura("Flame Shock"))
+        if (Api.Spellbook.CanCast("Flame Shock") && !Api.Spellbook.OnCooldown("Flame Shock") && !target.Auras.Contains("Flame Shock"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flame Shock");
@@ -394,7 +391,7 @@ var healthPercentage = me.HealthPercent;
             {
                 return true;
             }
-        }
+            GetStacks
         if (Api.Spellbook.CanCast("Lightning Bolt") && me.AuraStacks("Maelstrom Weapon") == 5)
 
         {
@@ -460,14 +457,14 @@ var healthPercentage = me.HealthPercent;
 
 		Console.ResetColor();
 
-        if (me.HasAura("Stoneskin"))
+        if (me.Auras.Contains("Stoneskin"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Have Stoneskin");
             Console.ResetColor();
             
         }
-        if (me.HasPermanent("Stoneskin"))
+        if (me.Auras.Contains("Stoneskin"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Have Stoneskin perma");
@@ -479,65 +476,32 @@ var healthPercentage = me.HealthPercent;
     }
 	private bool IsNPC(WowUnit unit)
 {
-    if (!IsValid(unit))
-    {
-        // If the unit is not valid, consider it not an NPC
-        return false;
-    }
-
-    foreach (var condition in npcConditions)
-    {
-        switch (condition)
+        private bool IsNPC(WowUnit unit)
         {
-            case "Innkeeper":
-                if (unit.IsInnkeeper())
-                    return true;
-                break;
-            case "Auctioneer":
-                if (unit.IsAuctioneer())
-                    return true;
-                break;
-            case "Banker":
-                if (unit.IsBanker())
-                    return true;
-                break;
-            case "FlightMaster":
-                if (unit.IsFlightMaster())
-                    return true;
-                break;
-            case "GuildBanker":
-                if (unit.IsGuildBanker())
-                    return true;
-                break;
-            
-            case "StableMaster":
-                if (unit.IsStableMaster())
-                    return true;
-                break;
-            
-            case "Trainer":
-                if (unit.IsTrainer())
-                    return true;
-                break;
-            
-           
-            case "Vendor":
-                if (unit.IsVendor())
-                    return true;
-                break;
-            case "QuestGiver":
-                if (unit.IsQuestGiver())
-                    return true;
-                break;
-           
-            
-           
-            // Add more conditions as needed...
+            if (!IsValid(unit))
+            {
+                // If the unit is not valid, consider it not an NPC
+                return false;
+            }
+
+            foreach (var condition in npcConditions)
+            {
+                switch (condition)
+                {
+                    case "Innkeeper" when unit.IsInnkeeper():
+                    case "Auctioneer" when unit.IsAuctioneer():
+                    case "Banker" when unit.IsBanker():
+                    case "FlightMaster" when unit.IsFlightMaster():
+                    case "GuildBanker" when unit.IsGuildBanker():
+                    case "StableMaster" when unit.IsStableMaster():
+                    case "Trainer" when unit.IsTrainer():
+                    case "Vendor" when unit.IsVendor():
+                    case "QuestGiver" when unit.IsQuestGiver():
+                        return true;
+                }
+            }
+
+            return false;
         }
+
     }
-
-    // If no matching condition was found, consider it not an NPC
-    return false;
-}
-
-	}

@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
+using System.Threading;
 using wShadow.Templates;
+using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
-using wShadow.Warcraft.Defines.Wow_Player;
+using wShadow.Warcraft.Managers;
+
 
 public class CatDruid : Rotation
 {
@@ -22,7 +24,7 @@ public class CatDruid : Rotation
             "Flight Form",
             "Swift Flight Form"
         };
-        return names.Any(t => me.HasPermanent(t));
+        return names.Any(t => me.Auras.Contains(t));
     }
     
     private int debugInterval = 30; // Set the debug interval in seconds
@@ -61,8 +63,8 @@ public class CatDruid : Rotation
         var me = Api.Player;
         var health = me.HealthPercent;
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.HasPermanent("Swift Flight Form") || me.HasPermanent("Flight Form") || me.HasPermanent("Travel Form")) return false;
-        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form") || me.Auras.Contains("Flight Form") || me.Auras.Contains("Travel Form")) return false;
+        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -70,34 +72,32 @@ public class CatDruid : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
         
-        if (Api.Spellbook.CanCast("Thorns"))
+        if (Api.Spellbook.CanCast("Thorns") && !me.Auras.Contains("Thorns"))
         {
-            if (!me.HasAura("Thorns"))
-            {
+            
                 Print($"Casting Thorns", ConsoleColor.Green);
                 if (Api.Spellbook.Cast("Thorns"))
                     return true;
-            }
+            
         }
 
-       if (Api.Spellbook.CanCast("Mark of the Wild"))
+       if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
-            if (!me.HasAura("Mark of the Wild"))
-            {
+            
                 Print($"Casting Mark of the Wild", ConsoleColor.Green);
                 if (Api.Spellbook.Cast("Mark of the Wild"))
                     return true;
-            }
+            
         }
         
-        if (Api.Spellbook.CanCast("Rejuvenation") && health <= 60 && !me.HasAura("Rejuvenation"))
+        if (Api.Spellbook.CanCast("Rejuvenation") && health <= 60 && !me.Auras.Contains("Rejuvenation"))
         {
             Print($"Casting Rejuvenation", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rejuvenation"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Regrowth") && health <= 40 && !me.HasAura("Regrowth"))
+        if (Api.Spellbook.CanCast("Regrowth") && health <= 40 && !me.Auras.Contains("Regrowth"))
         {
             Print($"Casting Regrowth", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Regrowth"))
@@ -111,7 +111,7 @@ public class CatDruid : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Cat Form") && !me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Cat Form"))
@@ -137,7 +137,7 @@ public class CatDruid : Rotation
         var target = Api.Target;
         if (!target.IsValid() || target.IsDeadOrGhost()) return false;
         
-        if (!me.HasAura("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)
+        if (!me.Auras.Contains("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)
         {
             Print($"Casting Innervate", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Innervate"))
@@ -158,40 +158,40 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Regrowth") && !me.HasAura("Regrowth") && me.HasAura("Barkskin"))
+        if (Api.Spellbook.CanCast("Regrowth") && !me.Auras.Contains("Regrowth") && me.Auras.Contains("Barkskin"))
         {
             Print($"Casting Regrowth", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Regrowth"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rejuvenation") && !me.HasAura("Rejuvenation") && me.HasAura("Barkskin"))
+        if (Api.Spellbook.CanCast("Rejuvenation") && !me.Auras.Contains("Rejuvenation") && me.Auras.Contains("Barkskin"))
         {
             Print($"Casting Rejuvenation", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rejuvenation"))
                 return true;
         }
         
-        if (Api.Spellbook.CanCast("Cat Form") && !me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Cat Form"))
                 return true;
         }
-        
-        if (Api.Spellbook.CanCast("Faerie Fire (Feral)"))
-        {
-            var hasFaerieFireAura = target.HasAura("Faerie Fire (Feral)", AuraFlags.None);
 
-            if (!hasFaerieFireAura || target.AuraRemains("Faerie Fire (Feral)") <= 1000)
+        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && !target.Auras.Contains("Faerie Fire (Feral)"))
+        {
+            if (target.Auras.TimeRemaining("Faerie Fire (Feral)") <= 1000)
             {
                 if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
                 {
-                    Print($"Casting Faerie Fire (Feral)", ConsoleColor.Green);
+                    Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
                     return true;
                 }
             }
         }
+    }
+}
 
         if (Api.Spellbook.CanCast("Maim") && (target.IsCasting() || target.IsChanneling()))
         {
@@ -200,61 +200,61 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.UnitsInRange(15, true).Count(x => me.GetReaction(x) <= UnitReaction.Neutral) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.HasAura("Berserk"))
+        if (Api.UnitsTargetingMe(15, true).Count(x => me.GetReaction(x) <= UnitReaction.Neutral) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.Auras.Contains("Berserk"))
         {
             Print($"Casting Berserk", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Berserk"))
                 return true;
         }
-        else if (me.HasAura("Berserk") && Api.Spellbook.CanCast("Mangle (Cat)"))
+        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle (Cat)"))
         {
             Print($"Casting Mangle (Cat)", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle (Cat)"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Savage Roar") && !me.HasAura("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Savage Roar") && !me.Auras.Contains("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Savage Roar with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Savage Roar"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.HasAura("Tiger's Fury") && !me.HasAura("Berserk") && target.HealthPercent >= 50 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Tiger's Fury", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Tiger's Fury"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rake") && !target.HasAura("Rake") && target.HealthPercent >= 30 && energy > 40 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Rake") && !target.Auras.Contains("Rake") && target.HealthPercent >= 30 && energy > 40 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Rake with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rake"))
                 return true;
         }
         
-        if (Api.Spellbook.CanCast("Rip") && !target.HasAura("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Rip with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rip"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Ferocious Bite with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Ferocious Bite"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Mangle (Cat)") && comboPoints < 5 && energy >= 45 && !target.HasAura("Mangle (Cat)") && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Mangle (Cat)") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle (Cat)") && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Mangle (Cat) with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle (Cat)"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.HasPermanent("Cat Form"))
+        if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Claw with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Claw"))
@@ -297,7 +297,7 @@ public class CatDruid : Rotation
         Console.WriteLine($"Player's Melee Haste: {meleeHaste}");
 
 
-        if (me.HasAura("Thorns")) // Replace "Thorns" with the actual aura name
+        if (me.Auras.Contains("Thorns")) // Replace "Thorns" with the actual aura name
         {
             Console.ForegroundColor = ConsoleColor.Blue;
 
@@ -308,7 +308,7 @@ public class CatDruid : Rotation
             Console.WriteLine($"Remaining time for Thorns: {roundedMinutes} minutes");
         }
 
-        if (me.HasAura("Mark of the Wild")) // Replace "Thorns" with the actual aura name
+        if (me.Auras.Contains("Mark of the Wild")) // Replace "Thorns" with the actual aura name
         {
             var remainingTimeSeconds = me.AuraRemains("Mark of the Wild");
             var remainingTimeMinutes = remainingTimeSeconds / 60; // Convert seconds to minutes
@@ -318,16 +318,16 @@ public class CatDruid : Rotation
             Console.ResetColor();
         }
 
-		if (me.HasPermanent("Travel Form"))
+		if (me.Auras.Contains("Travel Form"))
             Console.WriteLine($"We are in Travel Form");
         else Console.WriteLine($"We are not in Travel Form");
-		if (me.HasPermanent("Swift Flight Form"))
+		if (me.Auras.Contains("Swift Flight Form"))
             Console.WriteLine($"We are in Swift Flight Form");
 		        else Console.WriteLine($"We are not in Travel Form");
-if (me.HasPermanent("Flight Form"))
+if (me.Auras.Contains("Flight Form"))
             Console.WriteLine($"We are in Flight Form");
 		        else Console.WriteLine($"We are not in Travel Form");
-		       if (me.HasPermanent("Cat Form"))
+		       if (me.Auras.Contains("Cat Form"))
             Console.WriteLine($"We are in Cat Form");
         else Console.WriteLine($"We are not in Cat Form");
         

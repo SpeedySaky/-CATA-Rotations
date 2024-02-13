@@ -1,11 +1,10 @@
 using System;
 using System.Threading;
-using System.Collections.Generic;
 using wShadow.Templates;
+using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
-
 
 
 public class BMhunterWOTLK : Rotation
@@ -106,9 +105,9 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 // Target distance from the player
 
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsFlying()) return false;
-        if (me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 		
-		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.HasPermanent("Aspect of the Cheetah") && !me.IsMounted() )
+		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah") && !me.IsMounted() )
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -167,7 +166,7 @@ if (IsValid(pet) && (DateTime.Now - lastFeedTime).TotalMinutes >= 10 && Api.HasM
                 return true;
             }
         }
-	if (IsValid(pet) && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.HasAura("Mend Pet") && mana >10 )
+	if (IsValid(pet) && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet") && mana >10 )
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Pet health is low healing him");
@@ -176,7 +175,7 @@ if (IsValid(pet) && (DateTime.Now - lastFeedTime).TotalMinutes >= 10 && Api.HasM
             
                 return true;
 }
- if (IsValid(pet) && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.HasAura("Mend Pet") && mana >10 )
+ if (IsValid(pet) && PetHealth < 40  &&  Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet") && mana >10 )
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Pet health is low healing him");
@@ -185,7 +184,7 @@ if (IsValid(pet) && (DateTime.Now - lastFeedTime).TotalMinutes >= 10 && Api.HasM
             
                 return true;
 }
-if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of the Hawk") && !me.IsMounted()  && !me.HasPermanent("Aspect of the Cheetah"))
+if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk") && !me.IsMounted()  && !me.Auras.Contains("Aspect of the Cheetah"))
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -196,7 +195,7 @@ if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of t
 						
 					return true;
 					}
-if ( !target.IsDead() && !IsNPC(target)  && Api.Spellbook.CanCast("Hunter's Mark") && !target.HasAura("Hunter's Mark") && healthPercentage > 50 && mana > 20 && PetHealth > 50)  
+if ( !target.IsDead() && !IsNPC(target)  && Api.Spellbook.CanCast("Hunter's Mark") && !target.Auras.Contains("Hunter's Mark") && healthPercentage > 50 && mana > 20 && PetHealth > 50)  
     
         
       
@@ -280,7 +279,7 @@ var pet = me.Pet();
         }
 		if (targetDistance <= 5 )
         {
-            if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.HasPermanent("Aspect of the Monkey"))
+            if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.Auras.Contains("Aspect of the Monkey"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Aspect of the Monkey");
@@ -335,7 +334,7 @@ var pet = me.Pet();
         }
 		
         
-            if (Api.Spellbook.CanCast("Immolation Trap") && !target.HasAura("Immolation Trap"))
+            if (Api.Spellbook.CanCast("Immolation Trap") && !target.Auras.Contains("Immolation Trap"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Immolation Trap");
@@ -351,7 +350,7 @@ var pet = me.Pet();
 		 if (targetDistance > 10 )
 		 {
 		       
-			if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.HasPermanent("Aspect of the Hawk") )
+			if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk") )
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Aspect of the Hawk");
@@ -374,7 +373,7 @@ var pet = me.Pet();
                 }
             }
         
-		if (Api.Spellbook.CanCast("Serpent Sting") && !target.HasAura("Serpent Sting") && healthPercentage > 30 &&  mana > 20)
+		if (Api.Spellbook.CanCast("Serpent Sting") && !target.Auras.Contains("Serpent Sting") && healthPercentage > 30 &&  mana > 20)
 		{
 		Console.ForegroundColor = ConsoleColor.Green;
 		Console.WriteLine("Casting Serpent Sting");
@@ -446,67 +445,32 @@ if (IsValid(pet))
 
 Console.ResetColor();
     }
-	private bool IsNPC(WowUnit unit)
-{
-    if (!IsValid(unit))
+    private bool IsNPC(WowUnit unit)
     {
-        // If the unit is not valid, consider it not an NPC
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
+
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
         return false;
     }
 
-    foreach (var condition in npcConditions)
-    {
-        switch (condition)
-        {
-            case "Innkeeper":
-                if (unit.IsInnkeeper())
-                    return true;
-                break;
-            case "Auctioneer":
-                if (unit.IsAuctioneer())
-                    return true;
-                break;
-            case "Banker":
-                if (unit.IsBanker())
-                    return true;
-                break;
-            case "FlightMaster":
-                if (unit.IsFlightMaster())
-                    return true;
-                break;
-            case "GuildBanker":
-                if (unit.IsGuildBanker())
-                    return true;
-                break;
-            
-            case "StableMaster":
-                if (unit.IsStableMaster())
-                    return true;
-                break;
-            
-            case "Trainer":
-                if (unit.IsTrainer())
-                    return true;
-                break;
-            
-           
-            case "Vendor":
-                if (unit.IsVendor())
-                    return true;
-                break;
-            case "QuestGiver":
-                if (unit.IsQuestGiver())
-                    return true;
-                break;
-           
-            
-           
-            // Add more conditions as needed...
-        }
-    }
-
-    // If no matching condition was found, consider it not an NPC
-    return false;
 }
-
-	}

@@ -70,14 +70,14 @@ public class ZerkWarr : Rotation
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.HasAura("Drink") || me.HasAura("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
-            lastDebugTime = DateTime.Now; // Update lastDebugTime
+            lastDebugTime = DateTime.Now; 
         }
-        if (Api.Spellbook.CanCast("Berserker Stance") && !me.HasPermanent("Berserker Stance"))
+        if (Api.Spellbook.CanCast("Berserker Stance") && !me.Auras.Contains("Berserker Stance"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Berserker Stance");
@@ -91,7 +91,7 @@ public class ZerkWarr : Rotation
 
         var reaction = me.GetReaction(target);
 
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Charge") && me.HasPermanent("Berserker Stance") && targetDistance <= 25)
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Charge") && targetDistance <= 25)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Charge");
@@ -138,7 +138,7 @@ public class ZerkWarr : Rotation
         if (healthPercentage <= 30) //Last Stand and Shield wall
         {
 
-            if (Api.Spellbook.CanCast("Berserker Rage") && !me.HasAura("Berserker Rage") && !Api.Spellbook.OnCooldown("Berserker Rage") && rage < 15)
+            if (Api.Spellbook.CanCast("Berserker Rage") && !me.Auras.Contains("Berserker Rage") && !Api.Spellbook.OnCooldown("Berserker Rage") && rage < 15)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Berserker Rage");
@@ -147,7 +147,7 @@ public class ZerkWarr : Rotation
                 if (Api.Spellbook.Cast("Berserker Rage"))
                     return true;
             }
-            if (Api.Spellbook.CanCast("Enraged Regeneration") && !me.HasAura("Enraged Regeneration") && !Api.Spellbook.OnCooldown("Enraged Regeneration") && rage >= 15)
+            if (Api.Spellbook.CanCast("Enraged Regeneration") && !me.Auras.Contains("Enraged Regeneration") && !Api.Spellbook.OnCooldown("Enraged Regeneration") && rage >= 15)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Enraged Regeneration");
@@ -158,28 +158,28 @@ public class ZerkWarr : Rotation
             }
             return true;
         }
-
-        if (Api.UnitsNearby(5, true) == 1)
+        if (Api.Spellbook.CanCast("Battle Shout") && !me.Auras.Contains("Battle Shout") && rage >= 15)
         {
-            if (Api.Spellbook.CanCast("Battle Shout") && !me.HasAura("Battle Shout") && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Battle Shout");
-                Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Battle Shout");
+            Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Battle Shout"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Pummel");
-                Console.ResetColor();
+            if (Api.Spellbook.Cast("Battle Shout"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 15)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Pummel");
+            Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Pummel"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Rend") && !target.HasAura("Rend") && rage >= 15)
+            if (Api.Spellbook.Cast("Pummel"))
+                return true;
+        }
+        if (Api.UnitsTargetingMe(5, true) == 1)
+        {
+                       
+            if (Api.Spellbook.CanCast("Rend") && !target.Auras.Contains("Rend") && rage >= 15)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Rend");
@@ -208,7 +208,7 @@ public class ZerkWarr : Rotation
                     return true;
                 }
             }
-            if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.HasAura("Demoralizing Shout") && rage >= 10 && targethealth >= 30 && Api.UnitsNearby(10, true) >= 1 && rage >= 30)
+            if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.Auras.Contains("Demoralizing Shout") && rage >= 10 && targethealth >= 30 )
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Demoralizing Shout");
@@ -217,7 +217,7 @@ public class ZerkWarr : Rotation
 
                     return true;
             }
-            if (Api.Spellbook.CanCast("Thunder Clap") && !target.HasAura("Thunder Clap") && rage >= 20 && targethealth >= 30)
+            if (Api.Spellbook.CanCast("Thunder Clap") && !target.Auras.Contains("Thunder Clap") && rage >= 20 && targethealth >= 30)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Thunder Clap");
@@ -254,7 +254,7 @@ public class ZerkWarr : Rotation
 
                     return true;
             }
-            if (Api.Spellbook.CanCast("Slam") && !Api.Spellbook.OnCooldown("Slam") && rage >= 15 && me.HasAura("Bloodsurge"))
+            if (Api.Spellbook.CanCast("Slam") && !Api.Spellbook.OnCooldown("Slam") && rage >= 15 && me.Auras.Contains("Bloodsurge"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Slam");
@@ -291,27 +291,10 @@ public class ZerkWarr : Rotation
                     return true;
             }
         }
-        if (Api.UnitsNearby(5, true) >= 2)
+        if (Api.UnitsTargetingMe(15, true) >= 2)
         {
-            if (Api.Spellbook.CanCast("Battle Shout") && !me.HasAura("Battle Shout") && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Battle Shout");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Battle Shout"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Pummel");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Pummel"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Rend") && !target.HasAura("Rend") && rage >= 15)
+            
+            if (Api.Spellbook.CanCast("Rend") && !target.Auras.Contains("Rend") && rage >= 15)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Rend");
@@ -340,7 +323,7 @@ public class ZerkWarr : Rotation
                     return true;
                 }
             }
-            if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.HasAura("Demoralizing Shout") && rage >= 10 && targethealth >= 30 && Api.UnitsNearby(10, true) >= 1 && rage >= 30)
+            if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.Auras.Contains("Demoralizing Shout") && rage >= 10 && targethealth >= 30)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Demoralizing Shout");
@@ -349,7 +332,7 @@ public class ZerkWarr : Rotation
 
                     return true;
             }
-            if (Api.Spellbook.CanCast("Thunder Clap") && !target.HasAura("Thunder Clap") && rage >= 20 && targethealth >= 30)
+            if (Api.Spellbook.CanCast("Thunder Clap") && !target.Auras.Contains("Thunder Clap") && rage >= 20 && targethealth >= 30)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Thunder Clap");
@@ -457,50 +440,6 @@ public class ZerkWarr : Rotation
         Console.WriteLine($"{healthPercentage}% Health available");
 
 
-        if (me.HasPermanent("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasPermanent  Defensive Stance");
-        }
-
-        if (me.HasPassive("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasPassive  Defensive Stance");
-        }
-        if (me.HasAura("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasAura  Defensive Stance");
-        }
-
-        if (me.HasPermanent("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasPermanent Warbringer");
-        }
-
-        if (me.HasPassive("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasPassive  Warbringer");
-        }
-        if (me.HasAura("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"HasAura  Warbringer");
-        }
+       
     }
 }
