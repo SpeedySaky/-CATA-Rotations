@@ -12,21 +12,8 @@ public class CatDruid : Rotation
     private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
 
-    private bool IsMounted()
-    {
-        var result = false;
-        var me = Api.Player;
-        if (!me.IsValid() || me.IsDeadOrGhost()) return result;
 
-        var names = new[]
-        {
-            "Travel Form",
-            "Flight Form",
-            "Swift Flight Form"
-        };
-        return names.Any(t => me.Auras.Contains(t));
-    }
-    
+
     private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
 
@@ -40,7 +27,6 @@ public class CatDruid : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        var haste = UnitRating.HasteRanged;
         SlowTick = 800;
         FastTick = 200;
 
@@ -71,25 +57,25 @@ public class CatDruid : Rotation
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
-        
+
         if (Api.Spellbook.CanCast("Thorns") && !me.Auras.Contains("Thorns"))
         {
-            
-                Print($"Casting Thorns", ConsoleColor.Green);
-                if (Api.Spellbook.Cast("Thorns"))
-                    return true;
-            
+
+            Print($"Casting Thorns", ConsoleColor.Green);
+            if (Api.Spellbook.Cast("Thorns"))
+                return true;
+
         }
 
-       if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
+        if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
-            
-                Print($"Casting Mark of the Wild", ConsoleColor.Green);
-                if (Api.Spellbook.Cast("Mark of the Wild"))
-                    return true;
-            
+
+            Print($"Casting Mark of the Wild", ConsoleColor.Green);
+            if (Api.Spellbook.Cast("Mark of the Wild"))
+                return true;
+
         }
-        
+
         if (Api.Spellbook.CanCast("Rejuvenation") && health <= 60 && !me.Auras.Contains("Rejuvenation"))
         {
             Print($"Casting Rejuvenation", ConsoleColor.Green);
@@ -111,7 +97,7 @@ public class CatDruid : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form"))
+        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form", false))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Cat Form"))
@@ -136,21 +122,21 @@ public class CatDruid : Rotation
 
         var target = Api.Target;
         if (!target.IsValid() || target.IsDeadOrGhost()) return false;
-        
+
         if (!me.Auras.Contains("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)
         {
             Print($"Casting Innervate", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Innervate"))
                 return true;
         }
-        
+
         if (healthPercentage <= 30 && !Api.Spellbook.OnCooldown("Survival Instincts"))
         {
             Print($"Casting Survival Instincts as we geting low HP", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Survival Instincts"))
                 return true;
         }
-        
+
         if (healthPercentage <= 30 && !Api.Spellbook.OnCooldown("Barkskin"))
         {
             Print($"Casting Barkskin as we geting low HP", ConsoleColor.Green);
@@ -171,8 +157,8 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Rejuvenation"))
                 return true;
         }
-        
-        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form"))
+
+        if (Api.Spellbook.CanCast("Cat Form") && !me.Auras.Contains("Cat Form", false))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Cat Form"))
@@ -190,8 +176,8 @@ public class CatDruid : Rotation
                 }
             }
         }
-    }
-}
+
+
 
         if (Api.Spellbook.CanCast("Maim") && (target.IsCasting() || target.IsChanneling()))
         {
@@ -200,7 +186,7 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.UnitsTargetingMe(15, true).Count(x => me.GetReaction(x) <= UnitReaction.Neutral) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.Auras.Contains("Berserk"))
+        if (Api.UnitsNearby(15, false) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.Auras.Contains("Berserk"))
         {
             Print($"Casting Berserk", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Berserk"))
@@ -233,7 +219,7 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Rake"))
                 return true;
         }
-        
+
         if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.Auras.Contains("Cat Form"))
         {
             Print($"Casting Rip with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
@@ -270,69 +256,22 @@ public class CatDruid : Rotation
     {
         var me = Api.Player;
 
-        var rage = me.RagePercent;
         var energy = me.EnergyPercent;
         var manaPercentage = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
 
         Print(new[]
         {
-            $"{rage}% Rage available",
             $"{energy}% Energy available",
             $"{manaPercentage}% Mana available",
             $"{healthPercentage}% Health available"
         }, ConsoleColor.Red);
-        
+
         // Check if the player has the Cat Form aura by iterating through the player's auras
         // Retrieve the Strength value for a WowPlayer instance
         int strengthValue = me.GetStat(UnitStat.Strength);
 
-        // Display the Strength value in the console
-        Console.WriteLine($"Player's Strength: {strengthValue}");
 
-        // Retrieve the melee haste value from UnitRatings
-        double meleeHaste = me.Ratings.MeleeHaste;
-
-        // Display the melee haste value in the console
-        Console.WriteLine($"Player's Melee Haste: {meleeHaste}");
-
-
-        if (me.Auras.Contains("Thorns")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Blue;
-
-            var remainingTimeSeconds = me.AuraRemains("Thorns");
-            var remainingTimeMinutes = remainingTimeSeconds / 60; // Convert seconds to minutes
-            var roundedMinutes = Math.Round(remainingTimeMinutes / 1000, 1); // Round to one decimal place
-
-            Console.WriteLine($"Remaining time for Thorns: {roundedMinutes} minutes");
-        }
-
-        if (me.Auras.Contains("Mark of the Wild")) // Replace "Thorns" with the actual aura name
-        {
-            var remainingTimeSeconds = me.AuraRemains("Mark of the Wild");
-            var remainingTimeMinutes = remainingTimeSeconds / 60; // Convert seconds to minutes
-            var roundedMinutes = Math.Round(remainingTimeMinutes / 1000, 1); // Round to one decimal place
-
-            Console.WriteLine($"Remaining time for Mark of the Wild: {roundedMinutes} minutes");
-            Console.ResetColor();
-        }
-
-		if (me.Auras.Contains("Travel Form"))
-            Console.WriteLine($"We are in Travel Form");
-        else Console.WriteLine($"We are not in Travel Form");
-		if (me.Auras.Contains("Swift Flight Form"))
-            Console.WriteLine($"We are in Swift Flight Form");
-		        else Console.WriteLine($"We are not in Travel Form");
-if (me.Auras.Contains("Flight Form"))
-            Console.WriteLine($"We are in Flight Form");
-		        else Console.WriteLine($"We are not in Travel Form");
-		       if (me.Auras.Contains("Cat Form"))
-            Console.WriteLine($"We are in Cat Form");
-        else Console.WriteLine($"We are not in Cat Form");
-        
-        Console.ResetColor();
-        Console.ResetColor();
 
     }
 
