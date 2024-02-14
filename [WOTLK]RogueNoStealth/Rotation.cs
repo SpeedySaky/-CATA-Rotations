@@ -80,13 +80,10 @@ public class WOTLKRogueNoStealth : Rotation
         // Health percentage of the player
 
         // Power percentages for different resources
-        var energy = me.Energy; // Energy
-        var points = me.ComboPoints;
 
         // Target distance from the player
-        var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted()  || me.Auras.Contains("Food")) return false;
 
 
 
@@ -154,7 +151,7 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Evasion") && !me.Auras.Contains("Evasion") && Api.UnitsTargetingMe(15, true) >= 2 && !Api.Spellbook.OnCooldown("Evasion"))
+        if (Api.Spellbook.CanCast("Evasion") && !me.Auras.Contains("Evasion") && Api.UnfriendlyUnitsNearby(15, true) >= 2 && !Api.Spellbook.OnCooldown("Evasion"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Evasion");
@@ -163,7 +160,7 @@ public class WOTLKRogueNoStealth : Rotation
             if (Api.Spellbook.Cast("Evasion"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Adrenaline Rush") && !Api.Spellbook.OnCooldown("Adrenaline Rush") && Api.UnitsTargetingMe(5, true)>=2)
+        if (Api.Spellbook.CanCast("Adrenaline Rush") && !Api.Spellbook.OnCooldown("Adrenaline Rush") && Api.UnfriendlyUnitsNearby(5, true)>=2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Adrenaline Rush");
@@ -183,7 +180,7 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Blade Flurry") && !Api.Spellbook.OnCooldown("Blade Flurry") && energy >= 25 && Api.UnitsTargetingMe(5, true) >= 2)
+        if (Api.Spellbook.CanCast("Blade Flurry") && !Api.Spellbook.OnCooldown("Blade Flurry") && energy >= 25 && Api.UnfriendlyUnitsNearby(5, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blade Flurry");

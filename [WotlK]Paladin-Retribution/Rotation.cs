@@ -226,7 +226,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.UnitsTargetingMe(8, true) >= 2 && Api.Spellbook.CanCast("Divine Storm") && !!Api.Spellbook.OnCooldown("Divine Storm"))
+        if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Divine Storm") && !!Api.Spellbook.OnCooldown("Divine Storm"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Divine Storm");

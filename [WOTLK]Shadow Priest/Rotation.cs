@@ -52,83 +52,83 @@ public class PriestShadowWOTLK : Rotation
         {
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
-       
+        }
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || me.IsMounted()) return false;
 
-        if (Api.Spellbook.CanCast("Renew") && !me.Auras.Contains("Renew") && healthPercentage < 80)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Renew");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Renew"))
+            if (Api.Spellbook.CanCast("Renew") && !me.Auras.Contains("Renew") && healthPercentage < 80)
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Renew");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Renew"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Power Word: Fortitude") && !me.Auras.Contains("Power Word: Fortitude"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Power Word: Fortitude");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Power Word: Fortitude"))
+            if (Api.Spellbook.CanCast("Power Word: Fortitude") && !me.Auras.Contains("Power Word: Fortitude"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Power Word: Fortitude");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Power Word: Fortitude"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Divine Spirit") && !me.Auras.Contains("Divine Spirit"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Divine Spirit");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Divine Spirit"))
+            if (Api.Spellbook.CanCast("Divine Spirit") && !me.Auras.Contains("Divine Spirit"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Divine Spirit");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Divine Spirit"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Vampiric Embrace") && !me.Auras.Contains("Vampiric Embrace"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Vampiric Embrace");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Vampiric Embrace"))
+            if (Api.Spellbook.CanCast("Vampiric Embrace") && !me.Auras.Contains("Vampiric Embrace"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Vampiric Embrace");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Vampiric Embrace"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Shadow Protection") && !me.Auras.Contains("Shadow Protection"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shadow Protection");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Shadow Protection"))
+            if (Api.Spellbook.CanCast("Shadow Protection") && !me.Auras.Contains("Shadow Protection"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Shadow Protection");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Shadow Protection"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Inner Fire");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Inner Fire"))
+            if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Inner Fire");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Inner Fire"))
+                {
+                    return true;
+                }
             }
-        }
-        if (Api.Spellbook.CanCast("Shadowform") && !me.Auras.Contains("Shadowform"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shadowform");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Shadowform"))
+            if (Api.Spellbook.CanCast("Shadowform") && !me.Auras.Contains("Shadowform",false))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Shadowform");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Shadowform"))
+                {
+                    return true;
+                }
             }
-        }
-        return base.PassivePulse();
+            return base.PassivePulse();
 
-    }
+        }
 
     public override bool CombatPulse()
     {
@@ -148,7 +148,7 @@ public class PriestShadowWOTLK : Rotation
 
 
 
-        if (Api.Spellbook.CanCast("Shadowform") && !me.Auras.Contains("Shadowform"))
+        if (Api.Spellbook.CanCast("Shadowform") && !me.Auras.Contains("Shadowform",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shadowform");
@@ -159,7 +159,7 @@ public class PriestShadowWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Power Word: Shield") && !me.Auras.Contains("Power Word: Shield")&& && !me.Auras.Contains("Weakened Soul"))
+        if (Api.Spellbook.CanCast("Power Word: Shield") && !me.Auras.Contains("Power Word: Shield") && !me.Auras.Contains("Weakened Soul"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Power Word: Shield");

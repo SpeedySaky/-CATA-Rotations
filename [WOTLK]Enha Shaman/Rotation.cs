@@ -27,9 +27,9 @@ public class EnhaShamanWOTLK : Rotation
         }
         return true;
     }
-	private bool HasItem(object item)
+    private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
-		
+
     private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     private bool HasEnchantment(EquipmentSlot slot, string enchantmentName)
@@ -42,9 +42,9 @@ public class EnhaShamanWOTLK : Rotation
 
 
     public override void Initialize()
-    {  
-	//targets
-	npcConditions.Add("Innkeeper");
+    {
+        //targets
+        npcConditions.Add("Innkeeper");
         npcConditions.Add("Auctioneer");
         npcConditions.Add("Banker");
         npcConditions.Add("FlightMaster");
@@ -64,12 +64,12 @@ public class EnhaShamanWOTLK : Rotation
         npcConditions.Add("GarrisonMissionNPC");
         npcConditions.Add("GarrisonTalentNPC");
         npcConditions.Add("QuestGiver");
-		lastDebugTime = DateTime.Now;
+        lastDebugTime = DateTime.Now;
         LogPlayerStats();
         // Use this method to set your tick speeds.
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
-		// Assuming wShadow is an instance of some class containing UnitRatings property
+        // Assuming wShadow is an instance of some class containing UnitRatings property
         SlowTick = 800;
         FastTick = 300;
 
@@ -84,18 +84,18 @@ public class EnhaShamanWOTLK : Rotation
         // bool: needTarget -> If true action will not fire if player does not have a target
         // Func<bool>: function -> Action to attempt, must return true or false.
         CombatActions.Add((true, () => false));
-		
-		
-		
+
+
+
     }
-	public override bool PassivePulse()
-	{
-	 // Variables for player and target instances
-	var me = Api.Player;
-	var target = Api.Target;
-	var mana = me.ManaPercent;
-	var healthPercentage = me.HealthPercent;
-	var targethealth = target.HealthPercent;
+    public override bool PassivePulse()
+    {
+        // Variables for player and target instances
+        var me = Api.Player;
+        var target = Api.Target;
+        var mana = me.ManaPercent;
+        var healthPercentage = me.HealthPercent;
+        var targethealth = target.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
 
 
@@ -105,7 +105,7 @@ public class EnhaShamanWOTLK : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         bool hasFlametongueEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 1");
         bool hasFlametongueEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 2");
@@ -132,20 +132,20 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
 
         //off hand
         bool hasOffhandEnchantment1 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 1");
-        bool hasOffhandEnchantment2= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 2");
-        bool hasOffhandEnchantment3= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 3");
-        bool hasOffhandEnchantment4= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 4");
-        bool hasOffhandEnchantment5= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 5");
-        bool hasOffhandEnchantment6= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 6");
-        bool hasOffhandEnchantment7= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 7");
-        bool hasOffhandEnchantment8= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 8");
-        bool hasOffhandEnchantment9= HasEnchantment(EquipmentSlot.OffHand, "Flametongue 9");
+        bool hasOffhandEnchantment2 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 2");
+        bool hasOffhandEnchantment3 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 3");
+        bool hasOffhandEnchantment4 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 4");
+        bool hasOffhandEnchantment5 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 5");
+        bool hasOffhandEnchantment6 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 6");
+        bool hasOffhandEnchantment7 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 7");
+        bool hasOffhandEnchantment8 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 8");
+        bool hasOffhandEnchantment9 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 9");
 
         bool hasAnyRockbiterEnchantment = hasRockbiterEnchantment1 || hasRockbiterEnchantment2 || hasRockbiterEnchantment3;
-        bool hasAnyWindfuryEnchantment = hasWindfuryEnchantment1 || hasWindfuryEnchantment2 || hasWindfuryEnchantment3 || hasWindfuryEnchantment4 || hasWindfuryEnchantment5 ;
+        bool hasAnyWindfuryEnchantment = hasWindfuryEnchantment1 || hasWindfuryEnchantment2 || hasWindfuryEnchantment3 || hasWindfuryEnchantment4 || hasWindfuryEnchantment5;
         bool hasAnyFlametongueEnchantment = hasFlametongueEnchantment || hasFlametongueEnchantment2 || hasFlametongueEnchantment3 || hasFlametongueEnchantment4 || hasFlametongueEnchantment5 || hasFlametongueEnchantment6 || hasFlametongueEnchantment7 || hasFlametongueEnchantment8 || hasFlametongueEnchantment9;
 
-        if ( Api.Spellbook.CanCast("Windfury Weapon") && me.Level >40 && !hasAnyWindfuryEnchantment)
+        if (Api.Spellbook.CanCast("Windfury Weapon") && me.Level > 40 && !hasAnyWindfuryEnchantment)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Rockbiter Weapon");
@@ -155,7 +155,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        if ( Api.Spellbook.CanCast("Flametongue Weapon") && !hasAnyFlametongueEnchantment && me.Level>10 && me.Level<40)
+        if (Api.Spellbook.CanCast("Flametongue Weapon") && !hasAnyFlametongueEnchantment && me.Level > 10 && me.Level < 40)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flametongue Weapon");
@@ -165,7 +165,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        else if (!hasAnyRockbiterEnchantment && Api.Spellbook.CanCast("Rockbiter Weapon") && me.Level <10)
+        else if (!hasAnyRockbiterEnchantment && Api.Spellbook.CanCast("Rockbiter Weapon") && me.Level < 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Rockbiter Weapon");
@@ -175,7 +175,7 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Flametongue Weapon") && me.Level > 40 && (!hasOffhandEnchantment1 || !hasOffhandEnchantment2 || !hasOffhandEnchantment3 || !hasOffhandEnchantment4 || !hasOffhandEnchantment5 || !hasOffhandEnchantment6 || !hasOffhandEnchantment7 || !hasOffhandEnchantment8 || !hasOffhandEnchantment9 ))
+        if (Api.Spellbook.CanCast("Flametongue Weapon") && me.Level > 40 && (!hasOffhandEnchantment1 || !hasOffhandEnchantment2 || !hasOffhandEnchantment3 || !hasOffhandEnchantment4 || !hasOffhandEnchantment5 || !hasOffhandEnchantment6 || !hasOffhandEnchantment7 || !hasOffhandEnchantment8 || !hasOffhandEnchantment9))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flametongue Weapon on Offhand");
@@ -195,10 +195,10 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
                 return true;
             }
         }
-        if ( !target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Lightning Bolt") && healthPercentage > 50 && mana > 20 && targetDistance>25)  
-    
-        
-      
+        if (!target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Lightning Bolt") && healthPercentage > 50 && mana > 20 && targetDistance > 25)
+
+
+
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Lightning Bolt");
@@ -242,19 +242,19 @@ if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChann
 
         return base.PassivePulse();
 
-				}
-		
-public override bool CombatPulse()
-    {
-	// Variables for player and target instances
-var me = Api.Player;
-var target = Api.Target;
-var mana = me.ManaPercent;
-var targethealth = target.HealthPercent;
-var healthPercentage = me.HealthPercent;
+    }
 
-		var meTarget = me.Target;
- if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
+    public override bool CombatPulse()
+    {
+        // Variables for player and target instances
+        var me = Api.Player;
+        var target = Api.Target;
+        var mana = me.ManaPercent;
+        var targethealth = target.HealthPercent;
+        var healthPercentage = me.HealthPercent;
+
+        var meTarget = me.Target;
+        if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
@@ -322,7 +322,7 @@ var healthPercentage = me.HealthPercent;
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 50 && me.AuraStacks("Maelstrom Weapon") == 5)
+        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 50 && me.Auras.GetStacks("Maelstrom Weapon") == 5)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Healing Wave");
@@ -391,78 +391,78 @@ var healthPercentage = me.HealthPercent;
             {
                 return true;
             }
-            GetStacks
-        if (Api.Spellbook.CanCast("Lightning Bolt") && me.AuraStacks("Maelstrom Weapon") == 5)
 
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Lightning Bolt");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Lightning Bolt"))
+            if (Api.Spellbook.CanCast("Lightning Bolt") && me.Auras.GetStacks("Maelstrom Weapon") == 5)
+
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Lightning Bolt");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Lightning Bolt"))
+                {
+                    return true;
+                }
+            }
+            if (Api.Spellbook.CanCast("Lava Lash") && !Api.Spellbook.OnCooldown("Lava Lash"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Lava Lash");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Lava Lash"))
+                {
+                    return true;
+                }
+            }
+
+
+            if (Api.Spellbook.CanCast("Stormstrike") && !Api.Spellbook.OnCooldown("Stormstrike"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Stormstrike");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Stormstrike"))
+                {
+                    return true;
+                }
+            }
+            if (Api.Spellbook.CanCast("Auto Attack"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Attack");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Auto Attack"))
+                {
+                    return true;
+                }
             }
         }
-        if (Api.Spellbook.CanCast("Lava Lash") && !Api.Spellbook.OnCooldown("Lava Lash"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Lava Lash");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Lava Lash"))
-            {
-                return true;
-            }
-        }
-
-
-        if (Api.Spellbook.CanCast("Stormstrike") && !Api.Spellbook.OnCooldown("Stormstrike"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Stormstrike");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Stormstrike"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Auto Attack"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Attack");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Auto Attack"))
-            {
-                return true;
-            }
-        }
-
 
         return base.CombatPulse();
-}
-private void LogPlayerStats()
+    }
+    private void LogPlayerStats()
     {
         // Variables for player and target instances
-var me = Api.Player;
-var target = Api.Target;
-var mana = me.ManaPercent;
-var healthPercentage = me.HealthPercent;
+        var me = Api.Player;
+        var target = Api.Target;
+        var mana = me.ManaPercent;
+        var healthPercentage = me.HealthPercent;
 
 
-// Target distance from the player
+        // Target distance from the player
 
 
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana}% Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");
 
-		Console.ResetColor();
+        Console.ResetColor();
 
         if (me.Auras.Contains("Stoneskin"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Have Stoneskin");
             Console.ResetColor();
-            
+
         }
         if (me.Auras.Contains("Stoneskin"))
         {
@@ -474,34 +474,31 @@ var healthPercentage = me.HealthPercent;
 
         Console.ResetColor();
     }
-	private bool IsNPC(WowUnit unit)
-{
-        private bool IsNPC(WowUnit unit)
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
         {
-            if (!IsValid(unit))
-            {
-                // If the unit is not valid, consider it not an NPC
-                return false;
-            }
-
-            foreach (var condition in npcConditions)
-            {
-                switch (condition)
-                {
-                    case "Innkeeper" when unit.IsInnkeeper():
-                    case "Auctioneer" when unit.IsAuctioneer():
-                    case "Banker" when unit.IsBanker():
-                    case "FlightMaster" when unit.IsFlightMaster():
-                    case "GuildBanker" when unit.IsGuildBanker():
-                    case "StableMaster" when unit.IsStableMaster():
-                    case "Trainer" when unit.IsTrainer():
-                    case "Vendor" when unit.IsVendor():
-                    case "QuestGiver" when unit.IsQuestGiver():
-                        return true;
-                }
-            }
-
+            // If the unit is not valid, consider it not an NPC
             return false;
         }
 
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
     }
+}

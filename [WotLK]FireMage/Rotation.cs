@@ -215,30 +215,23 @@ public class FireMageWotlk : Rotation
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
             mana > 20 && !IsNPC(target))
         {
-            var reaction = me.GetReaction(target);
 
-            if (reaction != UnitReaction.Friendly)
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Fire Blast");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Fire Blast"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Fire Blast");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Fire Blast"))
-                {
-                    return true;
-                }
+                return true;
             }
+
             else
             {
                 // Handle if the target is friendly
                 Console.WriteLine("Target is friendly. Skipping Fire Blast cast.");
             }
         }
-        else
-        {
-            // Handle if the target is not valid
-            Console.WriteLine("Invalid target. Skipping Fire Blast cast.");
-        }
+       
         return base.PassivePulse();
 
     }
@@ -436,7 +429,7 @@ public class FireMageWotlk : Rotation
         {
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.ResetColor();
-            var remainingTimeSeconds = me.AuraRemains("Frost Armor");
+            var remainingTimeSeconds = me.Auras.TimeRemaining("Frost Armor");
             var remainingTimeMinutes = remainingTimeSeconds / 60; // Convert seconds to minutes
             var roundedMinutes = Math.Round(remainingTimeMinutes / 1000, 1); // Round to one decimal place
 
@@ -480,7 +473,7 @@ public class FireMageWotlk : Rotation
         int foodCount = 0;
         foreach (string foodType in foodTypes)
         {
-            int count = shadowApi.Inventory.ItemCount(foodType);
+            int count = shadowApi.Inventory.Api.Inventory.ItemCount(foodType);
             foodCount += count;
         }
 
@@ -488,7 +481,7 @@ public class FireMageWotlk : Rotation
         int waterCount = 0;
         foreach (string waterType in waterTypes)
         {
-            int count = shadowApi.Inventory.ItemCount(waterType);
+            int count = shadowApi.Inventory.Api.Inventory.ItemCount(waterType);
             waterCount += count;
         }
 

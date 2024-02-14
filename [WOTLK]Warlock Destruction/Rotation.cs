@@ -8,6 +8,7 @@ using wShadow.Warcraft.Managers;
 
 
 
+
 public class DestroLockWOTLK : Rotation
 {
     private List<string> npcConditions = new List<string>
@@ -17,7 +18,8 @@ public class DestroLockWOTLK : Rotation
         "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
         "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
         "QuestGiver"
-    }; private int debugInterval = 5; // Set the debug interval in seconds
+    }; 
+    private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     public bool IsValid(WowUnit unit)
 	{
@@ -27,8 +29,7 @@ public class DestroLockWOTLK : Rotation
 		}
 		return true;
 	}
-    private bool HasItem(object item)
-        => Api.Inventory.HasItem(item);
+    private bool HasItem(object item)=> Api.Inventory.HasItem(item);
     public override void Initialize()
     {
         //targets 
@@ -284,7 +285,7 @@ var pet = me.Pet();
                 // without triggering a premature exit
             }
         }
-if (Api.Spellbook.CanCast("Drain Soul") && ItemCount("Soul Shard") <= 2 && targethealth <= 20)
+if (Api.Spellbook.CanCast("Drain Soul") && Api.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
 {
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Drain Soul");
@@ -413,7 +414,7 @@ if (meTarget == null || target.IsDead())
 	}
 	
 	
-	if (Api.Spellbook.CanCast("Soul Fire") && targethealth>=200 && mana>=10 && ItemCount("Soul Shard") >= 2 )
+	if (Api.Spellbook.CanCast("Soul Fire") && targethealth>=200 && mana>=10 && Api.Inventory.ItemCount("Soul Shard") >= 2 )
 	{
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Casting Soul Fire");
@@ -465,7 +466,7 @@ var healthPercentage = me.HealthPercent;
 		Console.ResetColor();
 
 // Get the current count of Soul Shards in the inventory
-int soulShardCount = ItemCount("Soul Shard");
+int soulShardCount = Api.Inventory.ItemCount("Soul Shard");
 
 if ( soulShardCount >= 0 )
 {

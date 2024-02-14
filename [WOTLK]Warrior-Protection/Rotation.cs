@@ -8,24 +8,10 @@ using wShadow.Warcraft.Managers;
 
 
 
+
 public class ProtWarr : Rotation
 {
-    private List<string> npcConditions = new List<string>
-    {
-        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
-        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
-        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
-        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
-        "QuestGiver"
-    };
-    public bool IsValid(WowUnit unit)
-    {
-        if (unit == null || unit.Address == null)
-        {
-            return false;
-        }
-        return true;
-    }
+
     private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     private DateTime lastRevengeTime = DateTime.MinValue;
@@ -67,7 +53,7 @@ public class ProtWarr : Rotation
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -93,19 +79,21 @@ public class ProtWarr : Rotation
                 return true;
         }
 
-        var reaction = me.GetReaction(target);
+        if (!target.IsDead())
 
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Charge") && targetDistance <= 25)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Charge");
-            Console.ResetColor();
+            if (Api.Spellbook.CanCast("Charge") && (me.Auras.Contains("Battle Stance",false) || me.Auras.Contains("Warbringer",false)) && targetDistance <= 25)
 
-            if (Api.Spellbook.Cast("Charge"))
+
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Charge");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Charge"))
+                {
+                    return true;
+                }
             }
-        }
 
 
         return base.PassivePulse();
@@ -161,7 +149,7 @@ public class ProtWarr : Rotation
                     return true;
             }
         }
-        if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance"))
+        if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Defensive Stance");
@@ -201,7 +189,7 @@ public class ProtWarr : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.Auras.Contains("Demoralizing Shout") && rage >= 10 && targethealth >= 30  )
+        if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.Auras.Contains("Demoralizing Shout") && rage >= 10 && targethealth >= 30 && Api.UnfriendlyUnitsNearby(10, true) >= 1 && rage >= 30)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demoralizing Shout");
@@ -244,7 +232,7 @@ public class ProtWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Devastate") && target.AuraStacks("Sunder Armor") < 5 && rage >= 15)
+        if (Api.Spellbook.CanCast("Devastate") && target.Auras.GetStacks("Sunder Armor") < 5 && rage >= 15)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Devastate");
@@ -253,7 +241,7 @@ public class ProtWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Cleave") && Api.UnitsTargetingMe(8, true) >= 2 && rage >= 30)
+        if (Api.Spellbook.CanCast("Cleave") && Api.UnfriendlyUnitsNearby(5, true) >= 2 && rage >= 30)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Cleave");
@@ -275,33 +263,7 @@ public class ProtWarr : Rotation
 
         return base.CombatPulse();
     }
-    private bool IsNPC(WowUnit unit)
-    {
-        if (!IsValid(unit))
-        {
-            // If the unit is not valid, consider it not an NPC
-            return false;
-        }
 
-        foreach (var condition in npcConditions)
-        {
-            switch (condition)
-            {
-                case "Innkeeper" when unit.IsInnkeeper():
-                case "Auctioneer" when unit.IsAuctioneer():
-                case "Banker" when unit.IsBanker():
-                case "FlightMaster" when unit.IsFlightMaster():
-                case "GuildBanker" when unit.IsGuildBanker():
-                case "StableMaster" when unit.IsStableMaster():
-                case "Trainer" when unit.IsTrainer():
-                case "Vendor" when unit.IsVendor():
-                case "QuestGiver" when unit.IsQuestGiver():
-                    return true;
-            }
-        }
-
-        return false;
-    }
     private void LogPlayerStats()
     {
         var me = Api.Player;
@@ -315,7 +277,50 @@ public class ProtWarr : Rotation
         Console.WriteLine($"{healthPercentage}% Health available");
 
 
-        
-        
+        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains  Defensive Stance");
+        }
+
+        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains  Defensive Stance");
+        }
+        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains  Defensive Stance");
+        }
+
+        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains Warbringer");
+        }
+
+        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains  Warbringer");
+        }
+        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+
+            Console.WriteLine($"Auras.Contains  Warbringer");
+        }
     }
 }

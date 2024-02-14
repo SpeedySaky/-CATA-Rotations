@@ -9,8 +9,15 @@ using wShadow.Warcraft.Managers;
 
 public class BMhunterWOTLK : Rotation
 {
-	private List<string> npcConditions = new List<string>();
-	private bool HasItem(object item)
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    };
+    private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
 		public bool IsValid(WowUnit unit)
 	{
@@ -107,7 +114,7 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 		
-		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah")  )
+		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah",false)  )
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -184,7 +191,7 @@ if (IsValid(pet) && (DateTime.Now - lastFeedTime).TotalMinutes >= 10 && Api.HasM
             
                 return true;
 }
-if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk") && !me.IsMounted()  && !me.Auras.Contains("Aspect of the Cheetah"))
+if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk",false) && !me.IsMounted()  && !me.Auras.Contains("Aspect of the Cheetah",false))
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -279,7 +286,7 @@ var pet = me.Pet();
         }
 		if (targetDistance <= 5 )
         {
-            if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.Auras.Contains("Aspect of the Monkey"))
+            if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.Auras.Contains("Aspect of the Monkey",false))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Aspect of the Monkey");
@@ -350,7 +357,7 @@ var pet = me.Pet();
 		 if (targetDistance > 10 )
 		 {
 		       
-			if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk") )
+			if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk",false) )
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Aspect of the Hawk");

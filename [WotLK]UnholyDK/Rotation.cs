@@ -92,8 +92,7 @@ public class UnholyDK : Rotation
         }
         var reaction = me.GetReaction(target);
 
-        if ( !target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
-    mana > 20 && !IsNPC(target))
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted)  && !IsNPC(target))
         {
             if (Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
             {
@@ -140,17 +139,17 @@ public class UnholyDK : Rotation
                 return true;
         }
 
-        
-            if (Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Death Grip");
-                Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Death Grip"))
-                    return true;
-            }
-        
+        if (Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Death Grip");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Death Grip"))
+                return true;
+        }
+
         if (Api.Spellbook.CanCast("Horn of Winter") && !me.Auras.Contains("Horn of Winter"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -210,7 +209,7 @@ public class UnholyDK : Rotation
         }
 
 
-        if (Api.UnitsTargetingMe(10, true) >= 2 && Api.Spellbook.CanCast("Pestilence") && bloodRunes >= 1 || deathRunes >= 1 && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague"))
+        if (Api.UnfriendlyUnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Pestilence") && bloodRunes >= 1 || deathRunes >= 1 && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Pestilence ");
@@ -229,7 +228,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Death Strike"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Army of the Dead") && !me.IsCasting() && !Api.Spellbook.OnCooldown("Army of the Dead") && Api.UnitsTargetingMe(10, true) >= 2)
+        if (Api.Spellbook.CanCast("Army of the Dead") && !me.IsCasting() && !Api.Spellbook.OnCooldown("Army of the Dead") && Api.UnfriendlyUnitsNearby(10, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Army of the Dead");
@@ -239,7 +238,7 @@ public class UnholyDK : Rotation
                 return true;
         }
 
-        if (Api.UnitsTargetingMe(10, true) >= 2 && Api.Spellbook.CanCast("Blood Boil") && (bloodRunes >= 1 || deathRunes >= 1))
+        if (Api.UnfriendlyUnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Blood Boil") && (bloodRunes >= 1 || deathRunes >= 1))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Blood Boil");
@@ -249,7 +248,7 @@ public class UnholyDK : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Summon Gargoyle") && runicPower > 60 && !me.IsCasting() && !Api.Spellbook.OnCooldown("Summon Gargoyle") && Api.UnitsTargetingMe(10, true) >= 2)
+        if (Api.Spellbook.CanCast("Summon Gargoyle") && runicPower > 60 && !me.IsCasting() && !Api.Spellbook.OnCooldown("Summon Gargoyle") && Api.UnfriendlyUnitsNearby(10, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Summon Gargoyle");
@@ -258,7 +257,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Summon Gargoyle"))
                 return true;
         }
-        if (Api.UnitsTargetingMe(10, true) >= 2 && Api.Spellbook.CanCast("Bone Shield") && !me.Auras.Contains("Bone Shield") && !Api.Spellbook.OnCooldown("Bone Shield") && (unholyRunes >= 1 || deathRunes >= 1) && runicPower >= 10)
+        if (Api.UnfriendlyUnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Bone Shield") && !me.Auras.Contains("Bone Shield") && !Api.Spellbook.OnCooldown("Bone Shield") && (unholyRunes >= 1 || deathRunes >= 1) && runicPower >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Bone Shield ");
@@ -276,7 +275,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Blood Tap"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Unbreakable Armor") && me.Auras.Contains("Unbreakable Armor") && frostRunes >= 1 && runicPower >= 10 && Api.UnitsTargetingMe(10, true) >= 2)
+        if (Api.Spellbook.CanCast("Unbreakable Armor") && me.Auras.Contains("Unbreakable Armor") && frostRunes >= 1 && runicPower >= 10 && Api.UnfriendlyUnitsNearby(10, true) >= 2)
         {
 
 
