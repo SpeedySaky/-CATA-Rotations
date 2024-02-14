@@ -67,15 +67,14 @@ public class ProtWarr : Rotation
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || !me.IsMounted() || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
-        if (Api.Spellbook.CanCast("Battle Stance") && !me.Auras.Contains("Battle Stance") && !me.Auras.Contains("Warbringer"))
+        if (Api.Spellbook.CanCast("Battle Stance") && !me.Auras.Contains("Battle Stance",false) && !me.Auras.Contains("Warbringer",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Battle Stance");
@@ -84,7 +83,7 @@ public class ProtWarr : Rotation
 
                 return true;
         }
-        else if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance") && me.Auras.Contains("Warbringer"))
+        else if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance",false) && me.Auras.Contains("Warbringer",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Defensive Stance");

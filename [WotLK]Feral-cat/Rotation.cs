@@ -49,7 +49,7 @@ public class CatDruid : Rotation
         var me = Api.Player;
         var health = me.HealthPercent;
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form") || me.Auras.Contains("Flight Form") || me.Auras.Contains("Travel Form")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || !me.IsMounted() || !me.Auras.Contains("Swift Flight Form") || !me.Auras.Contains("Flight Form") || !me.Auras.Contains("Travel Form")) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)

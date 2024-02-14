@@ -54,8 +54,7 @@ public class PriestShadowWOTLK : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
        
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !me.IsMounted()) return false;
 
         if (Api.Spellbook.CanCast("Renew") && !me.Auras.Contains("Renew") && healthPercentage < 80)
         {

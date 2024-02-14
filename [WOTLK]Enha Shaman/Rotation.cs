@@ -105,7 +105,7 @@ public class EnhaShamanWOTLK : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsFlying()) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsMounted()) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         bool hasFlametongueEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 1");
         bool hasFlametongueEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 2");

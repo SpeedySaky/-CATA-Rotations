@@ -110,8 +110,7 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 
 // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsLooting() ) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsLooting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !me.IsMounted()) return false;
 		
 string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
 

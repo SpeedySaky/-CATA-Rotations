@@ -78,7 +78,7 @@ public class FireMageWotlk : Rotation
         var targetDistance = target.Position.Distance2D(me.Position);
         var reaction = me.GetReaction(target);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted()) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || !me.IsMounted()) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
