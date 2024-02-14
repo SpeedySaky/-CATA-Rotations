@@ -104,7 +104,7 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
 
 // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || !me.IsMounted()) return false;
+if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 		
 		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah")  )
