@@ -30,13 +30,41 @@ public class RetPalaWOTLK : Rotation
 
     }
 
+    public override bool MountedPulse()
+    {
+        var me = Api.Player;
+        var healthPercentage = me.HealthPercent;
+        var mana = me.ManaPercent;
+
+        if (me.IsDead() || me.IsGhost() ) return false;
+
+
+
+
+        if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura", false) && me.IsMounted())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Crusader Aura");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Crusader Aura"))
+            {
+                return true;
+            }
+        }
+        return base.MountedPulse();
+    }
+
+
+
+
     public override bool PassivePulse()
     {
         var me = Api.Player;
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling()  || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -56,8 +84,9 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+      
 
-        if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura") && !Api.Player.IsMounted())
+        if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Retribution Aura");
@@ -68,7 +97,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.Auras.Contains("Devotion Aura") && !Api.Player.Auras.Contains("Retribution Aura") && !Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.Auras.Contains("Devotion Aura", false) && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Devotion Aura");
@@ -79,7 +108,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura") && Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura",false) && Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Crusader Aura");
@@ -91,8 +120,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Blessing of Might") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.Auras.Contains("Hand of Protection") &&
-            !Api.Player.Auras.Contains("Divine Protection"))
+        if (Api.Spellbook.CanCast("Blessing of Might") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.Auras.Contains("Hand of Protection") && !Api.Player.Auras.Contains("Divine Protection") && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blessing of Might");
@@ -103,7 +131,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Might"))
+        else if (Api.Spellbook.CanCast("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blessing of Wisdom");
