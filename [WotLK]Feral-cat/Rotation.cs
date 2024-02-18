@@ -50,7 +50,10 @@ public class CatDruid : Rotation
         var health = me.HealthPercent;
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
-
+        if (IsValid(target))
+        {
+            TargetHealth = target.HealthPercent;
+        }
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false)) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -99,7 +102,7 @@ public class CatDruid : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768,false) && targetDistance<=30)
+        if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768,false)  && IsValid(target))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
             if (Api.Spellbook.Cast(768))
