@@ -16,7 +16,14 @@ public class CatDruid : Rotation
 
     private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
-
+    public bool IsValid(WowUnit unit)
+    {
+        if (unit == null || unit.Address == null)
+        {
+            return false;
+        }
+        return true;
+    }
     public override void Initialize()
     {
         // Can set min/max levels required for this rotation.
@@ -50,10 +57,10 @@ public class CatDruid : Rotation
         var health = me.HealthPercent;
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
-        if (IsValid(target))
-        {
-            TargetHealth = target.HealthPercent;
-        }
+
+        var targethealth = target.HealthPercent;
+
+        
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false)) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -126,6 +133,8 @@ public class CatDruid : Rotation
         var healthPercentage = me.HealthPercent;
 
         var target = Api.Target;
+        var targethealth = target.HealthPercent;
+
         if (!target.IsValid() || target.IsDeadOrGhost()) return false;
 
         if (!me.Auras.Contains("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)
