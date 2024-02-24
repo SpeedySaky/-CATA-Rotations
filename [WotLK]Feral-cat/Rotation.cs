@@ -13,7 +13,14 @@ public class CatDruid : Rotation
         => Api.Inventory.HasItem(item);
 
 
-
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    };
     private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
     public bool IsValid(WowUnit unit)
@@ -57,10 +64,13 @@ public class CatDruid : Rotation
         var health = me.HealthPercent;
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
+        var mana = me.ManaPercent;
+        var reaction = me.GetReaction(target);
 
         var targethealth = target.HealthPercent;
+        var meTarget = me.Target;
 
-        
+
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false)) return false;
         if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -109,12 +119,10 @@ public class CatDruid : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768,false)  && IsValid(target))
-        {
-            Print($"Casting Cat Form", ConsoleColor.Green);
-            if (Api.Spellbook.Cast(768))
-                return true;
-        }
+    
+             
+           
+        
 
 
 
@@ -298,7 +306,33 @@ public class CatDruid : Rotation
 
 
     }
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
 
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
+    }
 
     private void Print(string message, ConsoleColor color)
     {
