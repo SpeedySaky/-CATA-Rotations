@@ -474,7 +474,7 @@ public class FireMageWotlk : Rotation
         int foodCount = 0;
         foreach (string foodType in foodTypes)
         {
-            int count = shadowApi.Inventory.Api.Inventory.ItemCount(foodType);
+            int count = Api.Inventory.ItemCount(foodType);
             foodCount += count;
         }
 
@@ -482,7 +482,7 @@ public class FireMageWotlk : Rotation
         int waterCount = 0;
         foreach (string waterType in waterTypes)
         {
-            int count = shadowApi.Inventory.Api.Inventory.ItemCount(waterType);
+            int count = Api.Inventory.ItemCount(waterType);
             waterCount += count;
         }
 
