@@ -27,6 +27,10 @@ public class FireMageWotlk : Rotation
         }
         return true;
     }
+	private bool HasItem(EquipmentSlot slot)
+    {
+        return Api.Equipment.HasItem(slot);
+    }
     private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
     private int debugInterval = 5; // Set the debug interval in seconds
@@ -218,10 +222,10 @@ public class FireMageWotlk : Rotation
         {
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Fire Blast");
+            Console.WriteLine("Pulling with Frostbolt");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Fire Blast"))
+            if (Api.Spellbook.Cast("Frostbolt"))
             {
                 return true;
             }
@@ -229,7 +233,7 @@ public class FireMageWotlk : Rotation
             else
             {
                 // Handle if the target is friendly
-                Console.WriteLine("Target is friendly. Skipping Fire Blast cast.");
+                Console.WriteLine("Target is friendly. Skipping Pulling.");
             }
         }
        
@@ -361,8 +365,9 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Frostbolt"))
                 return true;
         }
+        bool hasRanged= HasItem(EquipmentSlot.Extra);
 
-        if (Api.Spellbook.CanCast("Shoot"))
+        if (Api.Spellbook.CanCast("Shoot") && hasRanged )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shoot");
@@ -371,8 +376,16 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Shoot"))
                 return true;
         }
+		else
+		if (Api.Spellbook.CanCast("Auto Attack") && !hasRanged)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("No ranged weapon--going auto attack");
+            Console.ResetColor();
 
-
+            if (Api.Spellbook.Cast("Auto Attack"))
+                return true;
+        }
 
 
 
