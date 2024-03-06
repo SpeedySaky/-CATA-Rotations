@@ -120,7 +120,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Blessing of Might") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.Auras.Contains("Hand of Protection") && !Api.Player.Auras.Contains("Divine Protection") && !Api.Player.IsMounted())
+        if (Api.Spellbook.CanCast("Blessing of Might") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.Auras.Contains("Hand of Protection") && !Api.Player.Auras.Contains("Divine Protection") && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blessing of Might");
@@ -131,7 +131,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Blessing of Wisdom") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blessing of Wisdom");

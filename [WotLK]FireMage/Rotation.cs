@@ -337,7 +337,7 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Pyroblast"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast"))
+        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast") && targetDistance<24)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fire Blast");
