@@ -45,13 +45,17 @@ public class UnholyDK : Rotation
         var me = Api.Player;
         var pet = me.Pet();
         var target = Api.Target;
+        var PetHealth = 0.0f;
 
         var targetDistance = target.Position.Distance2D(me.Position);
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Food")) return false;
-
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
         LogPlayerStatsPeriodically();
 
-        if (me.Auras.Contains("Glyph of Raise Dead") && pet == null && Api.Spellbook.CanCast("Raise Dead"))
+        if (!IsValid(pet) && me.Auras.Contains("Glyph of Raise Dead",false)  && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Raise Dead because we have the glyph.");
@@ -60,7 +64,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Raise Dead"))
                 return true;
         }
-        else if (HasItem("Corpse Dust") && pet == null && Api.Spellbook.CanCast("Raise Dead"))
+        else if (HasItem("Corpse Dust") && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Raise Dead with Corpse Dust as we don't have the glyph.");
@@ -119,8 +123,13 @@ public class UnholyDK : Rotation
         var unholyRunes = Api.UnholyRunesReady();
         var frostRunes = Api.FrostRunesReady();
         var deathRunes = Api.DeathRunesReady();
+        var PetHealth = 0.0f;
 
-        if (me.Auras.Contains("Glyph of Raise Dead") && pet == null && Api.Spellbook.CanCast("Raise Dead"))
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
+        if (me.Auras.Contains("Glyph of Raise Dead") && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Raise Dead because we have the glyph.");
@@ -129,7 +138,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Raise Dead"))
                 return true;
         }
-        else if (HasItem("Corpse Dust") && pet == null && Api.Spellbook.CanCast("Raise Dead"))
+        else if (HasItem("Corpse Dust") && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Raise Dead with Corpse Dust as we don't have the glyph.");
