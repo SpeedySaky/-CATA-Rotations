@@ -105,16 +105,15 @@ if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
-// Health percentage of the player
+        // Health percentage of the player
 
-// Power percentages for different resources
+        // Power percentages for different resources
 
-// Target distance from the player
+        // Target distance from the player
 
-if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
-		
-		if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah",false)  )
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
+        if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah",false)  )
 			
 					{
 						Console.ForegroundColor = ConsoleColor.Green;
@@ -247,8 +246,9 @@ var pet = me.Pet();
 
 // Target distance from the player
         var targetDistance = target.Position.Distance2D(me.Position);
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-		if (meTarget == null || target.IsDead())
+        if (meTarget == null || target.IsDead())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Assist Pet");

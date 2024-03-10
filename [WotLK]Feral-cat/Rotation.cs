@@ -71,8 +71,7 @@ public class CatDruid : Rotation
         var meTarget = me.Target;
 
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false)) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -142,6 +141,7 @@ public class CatDruid : Rotation
 
         var target = Api.Target;
         var targethealth = target.HealthPercent;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Travel Form", false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if (!target.IsValid() || target.IsDeadOrGhost()) return false;
 

@@ -105,8 +105,7 @@ public class EnhaShamanWOTLK : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsLooting() || me.IsMounted()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         bool hasFlametongueEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 1");
         bool hasFlametongueEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 2");
         bool hasFlametongueEnchantment3 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 3");
@@ -261,6 +260,7 @@ public class EnhaShamanWOTLK : Rotation
         }
 
         var targetDistance = target.Position.Distance2D(me.Position);
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.Auras.Contains("Stoneskin") && mana > 50)
         {

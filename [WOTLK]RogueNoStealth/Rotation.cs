@@ -72,6 +72,8 @@ public class WOTLKRogueNoStealth : Rotation
         var energy = me.Energy; // Energy
         var points = me.ComboPoints;
         var targetDistance = target.Position.Distance2D(me.Position);
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
@@ -106,6 +108,7 @@ public class WOTLKRogueNoStealth : Rotation
         var targethealth = target.HealthPercent;
         var energy = me.Energy; // Energy
         var points = me.ComboPoints;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         string[] HP = { "Major Healing Potion", "Superior Healing Potion", "Greater Healing Potion", "Healing Potion", "Lesser Healing Potion", "Minor Healing Potion" };
 

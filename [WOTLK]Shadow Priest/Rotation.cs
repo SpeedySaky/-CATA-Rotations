@@ -47,6 +47,7 @@ public class PriestShadowWOTLK : Rotation
         var me = Api.Player;
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -139,6 +140,7 @@ public class PriestShadowWOTLK : Rotation
         var healthPercentage = me.HealthPercent;
         var targethealth = target.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {

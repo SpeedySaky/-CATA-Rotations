@@ -64,7 +64,7 @@ public class RetPalaWOTLK : Rotation
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling()  || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -153,6 +153,7 @@ public class RetPalaWOTLK : Rotation
         var mana = me.ManaPercent;
         var target = Api.Target;
         var targetHealth = Api.Target.HealthPercent;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if (Api.Spellbook.CanCast("Flash of Light") && (Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && healthPercentage < 75)
         {

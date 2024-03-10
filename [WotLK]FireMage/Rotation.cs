@@ -82,9 +82,8 @@ public class FireMageWotlk : Rotation
         var targetDistance = target.Position.Distance2D(me.Position);
         var reaction = me.GetReaction(target);
 
-       
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
         string[] waterTypes = { "Conjured Mana Strudel", "Conjured Mountain Spring Water", "Conjured Crystal Water", "Conjured Sparkling Water", "Conjured Mineral Water", "Conjured Spring Water", "Conjured Purified Water", "Conjured Fresh Water", "Conjured Water" };
@@ -249,6 +248,7 @@ public class FireMageWotlk : Rotation
         var targethealth = target.HealthPercent;
         var mana = me.ManaPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {

@@ -48,7 +48,7 @@ public class UnholyDK : Rotation
         var PetHealth = 0.0f;
 
         var targetDistance = target.Position.Distance2D(me.Position);
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         if (IsValid(pet))
         {
             PetHealth = pet.HealthPercent;
@@ -124,12 +124,13 @@ public class UnholyDK : Rotation
         var frostRunes = Api.FrostRunesReady();
         var deathRunes = Api.DeathRunesReady();
         var PetHealth = 0.0f;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if (IsValid(pet))
         {
             PetHealth = pet.HealthPercent;
         }
-        if (me.Auras.Contains("Glyph of Raise Dead") && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
+        if (me.Auras.Contains("Glyph of Raise Dead",false) && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Raise Dead because we have the glyph.");

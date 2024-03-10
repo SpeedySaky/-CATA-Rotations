@@ -110,6 +110,7 @@ public class ProtWarr : Rotation
         var targethealth = target.HealthPercent;
 
         var meTarget = me.Target;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
         if (meTarget == null && Api.HasMacro("Target"))
