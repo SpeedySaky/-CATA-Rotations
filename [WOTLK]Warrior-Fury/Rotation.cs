@@ -44,8 +44,8 @@ public class ZerkWarr : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 400;
-        FastTick = 150;
+        SlowTick = 800;
+        FastTick = 400;
 
         // You can also use this method to add to various action lists.
 
@@ -116,6 +116,7 @@ public class ZerkWarr : Rotation
         var rage = me.Rage;
         var target = Api.Target;
         var targethealth = target.HealthPercent;
+        var CreatureType = Api.Target.Info.GetCreatureType();
 
         var meTarget = me.Target;
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
@@ -177,15 +178,7 @@ public class ZerkWarr : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Rend") && !target.Auras.Contains("Rend") && rage >= 15)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Rend");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Rend"))
-                return true;
-        }
+       
         if (healthPercentage >= 80 && Api.Spellbook.CanCast("Bloodrage") && !Api.Spellbook.OnCooldown("Bloodrage")) //Last Stand and Shield wall
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -215,15 +208,7 @@ public class ZerkWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Thunder Clap") && !target.Auras.Contains("Thunder Clap") && rage >= 20 && targethealth >= 30)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Thunder Clap");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Thunder Clap"))
-
-                return true;
-        }
+      
         if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness")) //Last Stand and Shield wall
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -233,7 +218,8 @@ public class ZerkWarr : Rotation
             {
                 return true;
             }
-        }
+        } 
+       
         if (Api.Spellbook.CanCast("Whirlwind") && !Api.Spellbook.OnCooldown("Whirlwind") && rage >= 25)
         {
             Console.ForegroundColor = ConsoleColor.Green;
