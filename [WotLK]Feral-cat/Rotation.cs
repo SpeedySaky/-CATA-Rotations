@@ -291,7 +291,6 @@ public class CatDruid : Rotation
 
         // Check if the player has the Cat Form aura by iterating through the player's auras
         // Retrieve the Strength value for a WowPlayer instance
-        int strengthValue = me.GetStat(UnitStat.Strength);
 
         if (me.Auras.Contains(768, false))
         {

@@ -250,7 +250,6 @@ public class DestroLockWOTLK : Rotation
         var healthPercentage = me.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        ShadowApi shadowApi = new ShadowApi();
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -284,13 +283,13 @@ public class DestroLockWOTLK : Rotation
                 // without triggering a premature exit
             }
         }
-        if (Api.Spellbook.CanCast("Drain Soul") && Api.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
+        if (Api.Spellbook.CanCast("Drain Soula") && Api.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Drain Soul");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Drain Soul"))
+            if (Api.Spellbook.Cast("Drain Soula"))
             {
                 return true;
             }
@@ -300,7 +299,7 @@ public class DestroLockWOTLK : Rotation
 
         foreach (string healthstoneType in healthstoneTypes)
         {
-            if (shadowApi.Inventory.HasItem(healthstoneType) && healthPercentage <= 40 && !shadowApi.Inventory.OnCooldown(healthstoneType))
+            if (Api.Inventory.HasItem(healthstoneType) && healthPercentage <= 40 && !Api.Inventory.OnCooldown(healthstoneType))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Using {healthstoneType}");
