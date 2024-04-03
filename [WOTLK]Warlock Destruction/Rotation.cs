@@ -134,7 +134,7 @@ public class DestroLockWOTLK : Rotation
 
             if (Api.Spellbook.Cast("Create Healthstone"))
             {
-                return true;
+                return false;
             }
         }
 
@@ -171,7 +171,7 @@ public class DestroLockWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor"))
+        if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor") && !me.Auras.Contains("Demon Skin"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demon Skin");
@@ -283,7 +283,7 @@ public class DestroLockWOTLK : Rotation
                 // without triggering a premature exit
             }
         }
-        if (Api.Spellbook.CanCast("Drain Soula") && Api.Inventory.ItemCount("Soul Shard") <= 2 && targethealth <= 20)
+        if (Api.Spellbook.CanCast("Drain Soula") && Api.Inventory.ItemCount("Soul Shard") <= 31 && targethealth <= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Drain Soul");
@@ -305,7 +305,7 @@ public class DestroLockWOTLK : Rotation
                 Console.WriteLine($"Using {healthstoneType}");
                 Console.ResetColor();
 
-                if (shadowApi.Inventory.Use(healthstoneType))
+                if (Api.Inventory.Use(healthstoneType))
                 {
                     return true;
                 }
