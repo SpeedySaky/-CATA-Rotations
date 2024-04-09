@@ -130,7 +130,6 @@ public class CatDruid : Rotation
 
     public override bool CombatPulse()
     {
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !target.IsValid() || target.IsDeadOrGhost()) return false;
         var me = Api.Player;
 
         var energy = me.EnergyPercent;
@@ -141,6 +140,7 @@ public class CatDruid : Rotation
 
         var target = Api.Target;
         var targethealth = target.HealthPercent;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !target.IsValid() || target.IsDeadOrGhost()) return false;
 
 
         if (!me.Auras.Contains("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)

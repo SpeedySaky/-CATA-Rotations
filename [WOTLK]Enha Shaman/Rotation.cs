@@ -71,7 +71,7 @@ public class EnhaShamanWOTLK : Rotation
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
         SlowTick = 800;
-        FastTick = 300;
+        FastTick = 400;
 
         // You can also use this method to add to various action lists.
 
@@ -144,6 +144,8 @@ public class EnhaShamanWOTLK : Rotation
         bool hasAnyWindfuryEnchantment = hasWindfuryEnchantment1 || hasWindfuryEnchantment2 || hasWindfuryEnchantment3 || hasWindfuryEnchantment4 || hasWindfuryEnchantment5;
         bool hasAnyFlametongueEnchantment = hasFlametongueEnchantment || hasFlametongueEnchantment2 || hasFlametongueEnchantment3 || hasFlametongueEnchantment4 || hasFlametongueEnchantment5 || hasFlametongueEnchantment6 || hasFlametongueEnchantment7 || hasFlametongueEnchantment8 || hasFlametongueEnchantment9;
 
+        bool hasAnyOffhandEnchantment= hasOffhandEnchantment1 || hasOffhandEnchantment2 || hasOffhandEnchantment3 || hasOffhandEnchantment4 || hasOffhandEnchantment5 || hasOffhandEnchantment6 || hasOffhandEnchantment7 || hasOffhandEnchantment8 || hasOffhandEnchantment9;
+
         if (Api.Spellbook.CanCast("Windfury Weapon") && me.Level > 40 && !hasAnyWindfuryEnchantment)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -174,7 +176,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Flametongue Weapon") && me.Level > 40 && (!hasOffhandEnchantment1 || !hasOffhandEnchantment2 || !hasOffhandEnchantment3 || !hasOffhandEnchantment4 || !hasOffhandEnchantment5 || !hasOffhandEnchantment6 || !hasOffhandEnchantment7 || !hasOffhandEnchantment8 || !hasOffhandEnchantment9))
+        if (Api.Spellbook.CanCast("Flametongue Weapon") && me.Level > 40 && !hasAnyOffhandEnchantment)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flametongue Weapon on Offhand");
@@ -208,32 +210,12 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Totemic Recall") && (me.Auras.Contains("Stoneskin") || me.Auras.Contains("Windfury Totem")))
+        if (Api.Spellbook.CanCast("Totemic Recall") && (me.Auras.Contains("Stoneskin",false) || me.Auras.Contains("Windfury Totem",false)))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Totemic Recall");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Totemic Recall"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Stoneskin Totem") && me.Auras.Contains("Stoneskin"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Removing Stoneskin Totem");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Stoneskin Totem"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Windfury Totem") && me.Auras.Contains("Windfury Totem"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Removing Windfury Totem");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Windfury Totem"))
             {
                 return true;
             }
@@ -262,7 +244,7 @@ public class EnhaShamanWOTLK : Rotation
         var targetDistance = target.Position.Distance2D(me.Position);
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.Auras.Contains("Stoneskin") && mana > 50)
+        if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.Auras.Contains("Stoneskin",false) && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Stoneskin Totem");
@@ -272,7 +254,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem") && mana > 50)
+        if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem",false) && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Windfury Totem");
@@ -312,12 +294,12 @@ public class EnhaShamanWOTLK : Rotation
             }
         }
         else
-        if (Api.Spellbook.CanCast("Mana Shield") && !me.Auras.Contains("Lightning Shield") && mana < 50)
+        if (Api.Spellbook.CanCast("Water Shield") && !me.Auras.Contains("Water Shield") &&  mana < 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Lighting Shield");
+            Console.WriteLine("Casting Water Shield");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Mana Shield"))
+            if (Api.Spellbook.Cast("Water Shield"))
             {
                 return true;
             }
@@ -362,7 +344,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Wind Shear") && !Api.Spellbook.OnCooldown("Wind Shear") && (target.IsCasting() || target.IsChanneling()))
+        if (Api.Spellbook.CanCast("Wind Shear") && !Api.Spellbook.OnCooldown("Wind Shear") && targetDistance<= 25 && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Wind Shear");
@@ -372,7 +354,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Earth Shock") && !Api.Spellbook.OnCooldown("Earth Shock") && (target.IsCasting() || target.IsChanneling()))
+        if (Api.Spellbook.CanCast("Earth Shock") && !Api.Spellbook.OnCooldown("Earth Shock") && targetDistance <= 25 && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Earth Shock");
