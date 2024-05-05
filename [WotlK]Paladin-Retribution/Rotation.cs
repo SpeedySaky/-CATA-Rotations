@@ -20,12 +20,16 @@ public class RetPalaWOTLK : Rotation
         return true;
     }
 
+    private CreatureType GetCreatureType(WowUnit unit)
+    {
+        return unit.Info.GetCreatureType();
+    }
     public override void Initialize()
     {
 
         lastDebugTime = DateTime.Now;
         LogPlayerStats();
-        SlowTick = 800;
+        SlowTick = 1000;
         FastTick = 400;
 
     }
@@ -36,7 +40,7 @@ public class RetPalaWOTLK : Rotation
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
 
-        if (me.IsDead() || me.IsGhost() ) return false;
+        if (me.IsDead() || me.IsGhost()) return false;
 
 
 
@@ -84,7 +88,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-      
+
 
         if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
         {
@@ -108,7 +112,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura",false) && Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura", false) && Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Crusader Aura");
@@ -198,10 +202,32 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        if ((Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && healthPercentage > 75)
+        CreatureType targetCreatureType = GetCreatureType(target);
+
+        if ((Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && targetHealth > 75)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Exorcism");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Exorcism"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && (targetCreatureType == CreatureType.Undead || targetCreatureType == CreatureType.Demon))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Exorcism on Demon or Undead");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Exorcism"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && mana > 50)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Exorcism with >50 mana");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Exorcism"))
             {
@@ -218,7 +244,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-       
+
 
         if (Api.Spellbook.CanCast("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Truth"))
         {
@@ -309,7 +335,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Templar's Verdict") && HolyPower>= 3)
+        if (Api.Spellbook.CanCast("Templar's Verdict") && HolyPower >= 3)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Templar's Verdict");
@@ -354,7 +380,7 @@ public class RetPalaWOTLK : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Crusader Strike") && mana > 50 && !Api.Spellbook.OnCooldown("Crusader Strike"))
+        if (Api.Spellbook.CanCast("Crusader Strike") && !Api.Spellbook.OnCooldown("Crusader Strike"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Crusader Strike");
