@@ -25,8 +25,8 @@ public class RetPalaWOTLK : Rotation
 
         lastDebugTime = DateTime.Now;
         LogPlayerStats();
-        SlowTick = 600;
-        FastTick = 200;
+        SlowTick = 800;
+        FastTick = 400;
 
     }
 
@@ -151,6 +151,8 @@ public class RetPalaWOTLK : Rotation
         var me = Api.Player;
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
+        var HolyPower = me.HolyPower;
+
         var target = Api.Target;
         var targetHealth = Api.Target.HealthPercent;
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
@@ -165,7 +167,16 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-
+        if (Api.Spellbook.CanCast("Rebuke") && mana > 10 && !Api.Spellbook.OnCooldown("Rebuke") && (target.IsCasting() || target.IsChanneling()))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Rebuke");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Rebuke"))
+            {
+                return true;
+            }
+        }
         if (Api.Spellbook.CanCast("Divine Protection") && healthPercentage < 45 && !me.IsCasting() && !Api.Player.Auras.Contains("Forbearance"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -197,8 +208,30 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        if (Api.Spellbook.CanCast("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Avenging Wrath");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Avenging Wrath"))
+            {
+                return true;
+            }
+        }
+       
 
-        if (Api.Spellbook.CanCast("Seal of Command") && !Api.Player.Auras.Contains("Seal of Command"))
+        if (Api.Spellbook.CanCast("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Truth"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Seal of Truth");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Seal of Truth"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Seal of Command") && !Api.Player.Auras.Contains("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Command"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Seal of Command");
@@ -209,7 +242,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Command"))
+        else if (Api.Spellbook.CanCast("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Command") && !Api.Player.Auras.Contains("Seal of Truth"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Seal of Righteousness");
@@ -265,6 +298,28 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        if (Api.Spellbook.CanCast("Templar's Verdict") && Api.Player.Auras.Contains(90174))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Templar's Verdict with Divine Purpose");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Templar's Verdict"))
+            {
+                return true;
+            }
+        }
+        if (Api.Spellbook.CanCast("Templar's Verdict") && HolyPower>= 3)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Templar's Verdict");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Templar's Verdict"))
+            {
+                return true;
+            }
+        }
         if (Api.Spellbook.CanCast("Holy Wrath") && targetHealth <= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -287,6 +342,17 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        else if (Api.Spellbook.CanCast("Hammer of Wrath") && Api.Player.Auras.Contains("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Hammer of Wrath");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Hammer of Wrath"))
+            {
+                return true;
+            }
+        }
+
 
         if (Api.Spellbook.CanCast("Crusader Strike") && mana > 50 && !Api.Spellbook.OnCooldown("Crusader Strike"))
         {
@@ -298,7 +364,16 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-
+        if (Api.Spellbook.CanCast("Judgement") && mana > 15 && !Api.Spellbook.OnCooldown("Judgement") && !Api.Spellbook.OnCooldown("Judgement") && (me.Auras.Contains("Seal of Truth") || me.Auras.Contains("Seal of Righteousness") || me.Auras.Contains("Seal of Command")))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Judgement");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Judgement"))
+            {
+                return true;
+            }
+        }
         return base.CombatPulse();
     }
 
@@ -308,10 +383,13 @@ public class RetPalaWOTLK : Rotation
 
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
+        var HolyPower = me.HolyPower;
 
 
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana}% Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
+        Console.WriteLine($"{HolyPower} HolyPower available");   // Insert your player stats logging using the new API
+
     }
 }
