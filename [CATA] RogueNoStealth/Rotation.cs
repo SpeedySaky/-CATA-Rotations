@@ -26,6 +26,10 @@ public class WOTLKRogueNoStealth : Rotation
         }
         return true;
     }
+    private CreatureType GetCreatureType(WowUnit unit)
+    {
+        return unit.Info.GetCreatureType();
+    }
     private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
 
@@ -45,7 +49,7 @@ public class WOTLKRogueNoStealth : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 600;
+        SlowTick = 1000;
         FastTick = 200;
 
         // You can also use this method to add to various action lists.
@@ -144,7 +148,7 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Kidney Shot") && energy >= 25 && !Api.Spellbook.OnCooldown("Kick") && (target.IsCasting() || target.IsChanneling()))
+        else if (Api.Spellbook.CanCast("Kidney Shot") && energy >= 25 && points>=1 && !Api.Spellbook.OnCooldown("Kidney Shot") && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Kidney Shot");
@@ -193,23 +197,34 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Rupture") && energy >= 25 && !target.Auras.Contains("Rupture") && points >= 3 && targethealth > 30)
+        CreatureType targetCreatureType = GetCreatureType(target);
+
+        if (Api.Spellbook.CanCast("Rupture") && energy >= 25 && !target.Auras.Contains("Rupture") && points >= 3 && targethealth > 30 && (targetCreatureType == CreatureType.Elemental || targetCreatureType == CreatureType.Mechanical))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Blade Flurry");
+            Console.WriteLine("Casting Rupture");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Blade Flurry"))
+            if (Api.Spellbook.Cast("Rupture"))
             {
                 return true;
             }
         }
-        if (Api.Spellbook.HasSpell("Slice and Dice") && points >= 2 && !me.Auras.Contains("Slice and Dice") && energy >= 25)
+        if (Api.Spellbook.HasSpell("Slice and Dice") && points >= 3 && !me.Auras.Contains("Slice and Dice") && energy >= 25)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Slice and Dice ");
             Console.ResetColor();
 
             if (Api.Spellbook.Cast("Slice and Dice"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Revealing Strike") && points == 4 && energy >= 40)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Casting Revealing Strike ");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Revealing Strike"))
                 return true;
         }
         if (Api.Spellbook.CanCast("Eviscerate") && points == 5 && energy >= 35)

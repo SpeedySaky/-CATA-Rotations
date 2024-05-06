@@ -31,6 +31,10 @@ public class CatDruid : Rotation
         }
         return true;
     }
+    private CreatureType GetCreatureType(WowUnit unit)
+    {
+        return unit.Info.GetCreatureType();
+    }
     public override void Initialize()
     {
         // Can set min/max levels required for this rotation.
@@ -41,8 +45,8 @@ public class CatDruid : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 800;
-        FastTick = 200;
+        SlowTick = 1000;
+        FastTick = 400;
 
         // You can also use this method to add to various action lists.
 
@@ -116,15 +120,9 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Healing Touch"))
                 return true;
         }
-
-
-    
-             
-           
         
-
-
-
+               
+       
         return base.PassivePulse();
     }
 
@@ -186,7 +184,6 @@ public class CatDruid : Rotation
         }
 
         if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && !target.Auras.Contains("Faerie Fire (Feral)"))
-        {
             if (target.Auras.TimeRemaining("Faerie Fire (Feral)") <= 1000)
             {
                 if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
@@ -226,7 +223,7 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains(768,false) && energy<=40)
         {
             Print($"Casting Tiger's Fury", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Tiger's Fury"))
