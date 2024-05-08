@@ -75,7 +75,7 @@ public class CatDruid : Rotation
         var meTarget = me.Target;
 
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form",false) || me.Auras.Contains("Flight Form",false) || me.Auras.Contains("Travel Form",false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Travel Form", false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -120,9 +120,9 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Healing Touch"))
                 return true;
         }
-        
-               
-       
+
+
+
         return base.PassivePulse();
     }
 
@@ -192,7 +192,7 @@ public class CatDruid : Rotation
                     return true;
                 }
             }
-        }
+
 
 
 
@@ -209,55 +209,55 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Berserk"))
                 return true;
         }
-        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle (Cat)") && me.Auras.Contains(768,false))
+        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle (Cat)") && me.Auras.Contains(768, false))
         {
             Print($"Casting Mangle (Cat)", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle (Cat)"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Savage Roar") && !me.Auras.Contains("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Savage Roar") && !me.Auras.Contains("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 && me.Auras.Contains(768, false))
         {
             Print($"Casting Savage Roar with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Savage Roar"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains(768,false) && energy<=40)
+        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains(768, false) && energy <= 40)
         {
             Print($"Casting Tiger's Fury", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Tiger's Fury"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rake") && !target.Auras.Contains("Rake") && target.HealthPercent >= 30 && energy > 40 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Rake") && !target.Auras.Contains("Rake") && target.HealthPercent >= 30 && energy > 40 && me.Auras.Contains(768, false))
         {
             Print($"Casting Rake with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rake"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.Auras.Contains(768, false))
         {
             Print($"Casting Rip with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rip"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5 && me.Auras.Contains(768, false))
         {
             Print($"Casting Ferocious Bite with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Ferocious Bite"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Mangle (Cat)") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle (Cat)") && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Mangle (Cat)") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle (Cat)") && me.Auras.Contains(768, false))
         {
             Print($"Casting Mangle (Cat) with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle (Cat)"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.Auras.Contains(768,false))
+        if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.Auras.Contains(768, false))
         {
             Print($"Casting Claw with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Claw"))
@@ -290,7 +290,7 @@ public class CatDruid : Rotation
         if (me.Auras.Contains(768, false))
         {
             Print($"Have 768 Form", ConsoleColor.Green);
-            
+
         }
         if (me.Auras.Contains("Cat Form", false))
         {
