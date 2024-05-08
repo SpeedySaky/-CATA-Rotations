@@ -83,14 +83,7 @@ public class CatDruid : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-        if (Api.Spellbook.CanCast("Thorns") && !me.Auras.Contains("Thorns"))
-        {
-
-            Print($"Casting Thorns", ConsoleColor.Green);
-            if (Api.Spellbook.Cast("Thorns"))
-                return true;
-
-        }
+    
 
         if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
