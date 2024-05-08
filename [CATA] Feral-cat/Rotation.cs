@@ -75,7 +75,7 @@ public class CatDruid : Rotation
         var meTarget = me.Target;
 
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMounted() || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Travel Form", false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Travel Form", false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -113,7 +113,24 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Healing Touch"))
                 return true;
         }
+        if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768, false))
+        {
+            Print($"Casting Cat Form", ConsoleColor.Green);
+            if (Api.Spellbook.Cast(768))
+                return true;
+        }
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+        {
+            if (Api.Spellbook.CanCast("Feral Charge") && targetDistance > 5 && targetDistance < 25 && !Api.Spellbook.OnCooldown("Feral Charge"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Feral Charge");
+                Console.ResetColor();
 
+                if (Api.Spellbook.Cast("Feral Charge"))
+                    return true;
+            }
+        }
 
 
         return base.PassivePulse();
@@ -202,10 +219,10 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Berserk"))
                 return true;
         }
-        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle (Cat)") && me.Auras.Contains(768, false))
+        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle") && me.Auras.Contains(768, false))
         {
-            Print($"Casting Mangle (Cat)", ConsoleColor.Green);
-            if (Api.Spellbook.Cast("Mangle (Cat)"))
+            Print($"Casting Mangle", ConsoleColor.Green);
+            if (Api.Spellbook.Cast("Mangle"))
                 return true;
         }
 
@@ -243,10 +260,10 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Ferocious Bite"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Mangle (Cat)") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle (Cat)") && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Mangle") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle") && me.Auras.Contains(768, false))
         {
-            Print($"Casting Mangle (Cat) with {energy} Energy", ConsoleColor.Green);
-            if (Api.Spellbook.Cast("Mangle (Cat)"))
+            Print($"Casting Mangle  with {energy} Energy", ConsoleColor.Green);
+            if (Api.Spellbook.Cast("Mangle"))
                 return true;
         }
 

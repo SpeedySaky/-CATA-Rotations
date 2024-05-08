@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
+using wShadow.Warcraft.Usefuls;
+
 
 
 
@@ -149,7 +151,7 @@ public class DestroLockWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor"))
+        if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fel Armor");
@@ -160,7 +162,7 @@ public class DestroLockWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor"))
+        if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor",false) && !me.Auras.Contains("Demon Armor",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demon Armor");
@@ -171,7 +173,7 @@ public class DestroLockWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor") && !me.Auras.Contains("Demon Armor") && !me.Auras.Contains("Demon Skin"))
+        if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor",false) && !me.Auras.Contains("Demon Armor",false) && !me.Auras.Contains("Demon Skin",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demon Skin");
