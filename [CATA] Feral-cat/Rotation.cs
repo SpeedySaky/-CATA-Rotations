@@ -83,7 +83,7 @@ public class CatDruid : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-
+    
 
         if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
@@ -121,7 +121,7 @@ public class CatDruid : Rotation
         }
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
         {
-            if (Api.Spellbook.CanCast("Feral Charge") && targetDistance > 5 && targetDistance < 25 && !Api.Spellbook.OnCooldown("Feral Charge"))
+            if (Api.Spellbook.CanCast("Feral Charge") && targetDistance > 5 && targetDistance < 25 && !Api.Spellbook.OnCooldown("Feral Charge") && !Api.Spellbook.OnCooldown("Feral Charge"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Feral Charge");
@@ -129,6 +129,15 @@ public class CatDruid : Rotation
 
                 if (Api.Spellbook.Cast("Feral Charge"))
                     return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
+
+        {
+            if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
+            {
+                Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
+                return true;
             }
         }
 
@@ -195,13 +204,13 @@ public class CatDruid : Rotation
 
         if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
 
-        {
-            if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
             {
-                Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
-                return true;
+                if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
+                {
+                    Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
+                    return true;
+                }
             }
-        }
 
 
 
