@@ -83,7 +83,7 @@ public class CatDruid : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-    
+
 
         if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
@@ -193,15 +193,15 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && !target.Auras.Contains("Faerie Fire (Feral)"))
-            if (target.Auras.TimeRemaining("Faerie Fire (Feral)") <= 1000)
+        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
+
+        {
+            if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
             {
-                if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
-                {
-                    Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
-                    return true;
-                }
+                Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
+                return true;
             }
+        }
 
 
 
