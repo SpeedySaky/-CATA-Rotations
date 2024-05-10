@@ -239,7 +239,17 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 50 )
+        if(Api.Spellbook.CanCast("Healing Surge") && healthPercentage <= 50)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Healing Surge");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Healing Surge"))
+            {
+                return true;
+            }
+        }
+        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 80 )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Healing Wave");
