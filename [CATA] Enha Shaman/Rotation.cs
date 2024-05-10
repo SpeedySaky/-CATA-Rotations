@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using wShadow.Templates;
+using System.Linq;
 using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
@@ -21,12 +22,13 @@ public class EnhaShamanWOTLK : Rotation
     };
     public bool IsValid(WowUnit unit)
     {
-        if (unit == null || unit.Address == null)
+        if (unit == null || unit.Address == null || unit.Name != "Searing Totem")
         {
             return false;
         }
         return true;
     }
+
     private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
 
@@ -36,7 +38,7 @@ public class EnhaShamanWOTLK : Rotation
     {
         return Api.Equipment.HasEnchantment(slot, enchantmentName);
     }
-    private TimeSpan Searing = TimeSpan.FromSeconds(60);
+    private TimeSpan Searing = TimeSpan.FromSeconds(20);
     private DateTime LastSearing = DateTime.MinValue;
 
 
@@ -209,20 +211,18 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if ((DateTime.Now - LastSearing) >= Searing)
+
+        var searingTotem = Api.Units.FirstOrDefault(unit => unit.Name == "Searing Totem");
+
+        if (searingTotem == null || !searingTotem.IsValid())
         {
-            // Check if you can cast Searing Totem and have enough mana
-            if (Api.Spellbook.CanCast("Searing Totem") && mana > 50)
+            if (Api.Spellbook.CanCast("Searing Totem"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Searing Totem");
                 Console.ResetColor();
-
-                // Cast Searing Totem
                 if (Api.Spellbook.Cast("Searing Totem"))
                 {
-                    // Update the timestamp for the last time Searing Totem was cast
-                    LastSearing = DateTime.Now;
                     return true;
                 }
             }
@@ -392,6 +392,22 @@ public class EnhaShamanWOTLK : Rotation
             Console.WriteLine("Have Stoneskin perma");
             Console.ResetColor();
 
+        }
+
+
+        var searingTotem = Api.Units.FirstOrDefault(unit => unit.Name == "Searing Totem");
+
+        if (searingTotem != null && searingTotem.IsValid())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("We have Searing Totem");
+            Console.ResetColor();
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("We don't have Searing Totem");
+            Console.ResetColor();
         }
 
         Console.ResetColor();
