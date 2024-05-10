@@ -72,7 +72,7 @@ public class EnhaShamanWOTLK : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 800;
+        SlowTick = 1200;
         FastTick = 400;
 
         // You can also use this method to add to various action lists.
@@ -212,7 +212,7 @@ public class EnhaShamanWOTLK : Rotation
             }
         }
 
-        var searingTotem = Api.Units.FirstOrDefault(unit => unit.Name == "Searing Totem");
+        var searingTotem = Api.Units.FirstOrDefault(unit => unit.Name == "Searing Totem" && unit.OwnerGuid.Equals(Api.Player.Guid));
 
         if (searingTotem == null || !searingTotem.IsValid())
         {
@@ -223,11 +223,48 @@ public class EnhaShamanWOTLK : Rotation
                 Console.ResetColor();
                 if (Api.Spellbook.Cast("Searing Totem"))
                 {
+                    if (this.SlowTick != 650)
+                    {
+                        SlowTick = 650;
+                    }
                     return true;
                 }
             }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Cannot cast Searing Totem");
+                Console.ResetColor();
+            }
         }
 
+
+        var HealingTotem = Api.Units.FirstOrDefault(unit => unit.Name == "Healing Stream Totem" && unit.OwnerGuid.Equals(Api.Player.Guid));
+
+        if (HealingTotem == null || !HealingTotem.IsValid())
+        {
+            if (Api.Spellbook.CanCast("Healing Stream Totem"))
+            {
+                if (this.SlowTick != 650)
+                {
+                    SlowTick = 650;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Healing Stream Totem");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Healing Stream Totem"))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Cannot cast Healing Stream Totem");
+                Console.ResetColor();
+            }
+        }
         if (Api.Spellbook.CanCast("Lightning Shield") && !me.Auras.Contains("Lightning Shield") && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
