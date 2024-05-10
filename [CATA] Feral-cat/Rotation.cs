@@ -193,8 +193,7 @@ public class CatDruid : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && !target.Auras.Contains("Faerie Fire (Feral)"))
-            if (target.Auras.TimeRemaining("Faerie Fire (Feral)") <= 1000)
+        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire")|| target.Auras.TimeRemaining("Faerie Fire") <= 1000))
             {
                 if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
                 {
@@ -307,7 +306,11 @@ public class CatDruid : Rotation
             Print($"Have Cat Form", ConsoleColor.Green);
 
         }
-
+        if (me.Auras.TimeRemaining("Mark of the Wild") <= 3600000)
+        {
+            var timeRemainingInMinutes = me.Auras.TimeRemaining("Mark of the Wild") / 60000; // Convert milliseconds to minutes
+            Print($"Mark of the Wild, {timeRemainingInMinutes} minutes remaining", ConsoleColor.Green);
+        }
 
     }
     private bool IsNPC(WowUnit unit)

@@ -36,7 +36,7 @@ public class EnhaShamanWOTLK : Rotation
     {
         return Api.Equipment.HasEnchantment(slot, enchantmentName);
     }
-    private TimeSpan Searing = TimeSpan.FromSeconds(20);
+    private TimeSpan Searing = TimeSpan.FromSeconds(60);
     private DateTime LastSearing = DateTime.MinValue;
 
 
@@ -106,57 +106,23 @@ public class EnhaShamanWOTLK : Rotation
         }
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
-        bool hasFlametongueEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 1");
-        bool hasFlametongueEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 2");
-        bool hasFlametongueEnchantment3 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 3");
-        bool hasFlametongueEnchantment4 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 4");
-        bool hasFlametongueEnchantment5 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 5");
-        bool hasFlametongueEnchantment6 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 6");
-        bool hasFlametongueEnchantment7 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 7");
-        bool hasFlametongueEnchantment8 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 8");
-        bool hasFlametongueEnchantment9 = HasEnchantment(EquipmentSlot.MainHand, "Flametongue 9");
-        bool hasRockbiterEnchantment1 = HasEnchantment(EquipmentSlot.MainHand, "Rockbiter 1");
-        bool hasRockbiterEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Rockbiter 2");
-        bool hasRockbiterEnchantment3 = HasEnchantment(EquipmentSlot.MainHand, "Rockbiter 3");
-        bool hasWindfuryEnchantment1 = HasEnchantment(EquipmentSlot.MainHand, "Windfury");
-        bool hasWindfuryEnchantment2 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 2");
-        bool hasWindfuryEnchantment3 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 3");
-        bool hasWindfuryEnchantment4 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 4");
-        bool hasWindfuryEnchantment5 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 5");
-        bool hasWindfuryEnchantment6 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 6");
-        bool hasWindfuryEnchantment7 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 7");
-        bool hasWindfuryEnchantment8 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 8");
-        bool hasWindfuryEnchantment9 = HasEnchantment(EquipmentSlot.MainHand, "Windfury 9");
+        bool hasOffhandEnchantment = HasEnchantment(EquipmentSlot.OffHand, "Flametongue");
+        bool hasMainHandEnchantment = HasEnchantment(EquipmentSlot.MainHand, "Windfury");
 
 
         //off hand
-        bool hasOffhandEnchantment1 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 1");
-        bool hasOffhandEnchantment2 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 2");
-        bool hasOffhandEnchantment3 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 3");
-        bool hasOffhandEnchantment4 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 4");
-        bool hasOffhandEnchantment5 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 5");
-        bool hasOffhandEnchantment6 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 6");
-        bool hasOffhandEnchantment7 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 7");
-        bool hasOffhandEnchantment8 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 8");
-        bool hasOffhandEnchantment9 = HasEnchantment(EquipmentSlot.OffHand, "Flametongue 9");
 
-        bool hasAnyRockbiterEnchantment = hasRockbiterEnchantment1 || hasRockbiterEnchantment2 || hasRockbiterEnchantment3;
-        bool hasAnyWindfuryEnchantment = hasWindfuryEnchantment1 || hasWindfuryEnchantment2 || hasWindfuryEnchantment3 || hasWindfuryEnchantment4 || hasWindfuryEnchantment5;
-        bool hasAnyFlametongueEnchantment = hasFlametongueEnchantment || hasFlametongueEnchantment2 || hasFlametongueEnchantment3 || hasFlametongueEnchantment4 || hasFlametongueEnchantment5 || hasFlametongueEnchantment6 || hasFlametongueEnchantment7 || hasFlametongueEnchantment8 || hasFlametongueEnchantment9;
-
-        bool hasAnyOffhandEnchantment= hasOffhandEnchantment1 || hasOffhandEnchantment2 || hasOffhandEnchantment3 || hasOffhandEnchantment4 || hasOffhandEnchantment5 || hasOffhandEnchantment6 || hasOffhandEnchantment7 || hasOffhandEnchantment8 || hasOffhandEnchantment9;
-
-        if (Api.Spellbook.CanCast("Windfury Weapon") && me.Level > 40 && !hasAnyWindfuryEnchantment)
+        if (Api.Spellbook.CanCast("Windfury Weapon") && !hasMainHandEnchantment)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Rockbiter Weapon");
+            Console.WriteLine("Casting Windfury Weapon");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Windfury Weapon"))
             {
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Flametongue Weapon") && !hasAnyFlametongueEnchantment && me.Level > 10 && me.Level < 40)
+        if (Api.Spellbook.CanCast("Flametongue Weapon") && !hasOffhandEnchantment)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flametongue Weapon");
@@ -166,26 +132,8 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        else if (!hasAnyRockbiterEnchantment && Api.Spellbook.CanCast("Rockbiter Weapon") && me.Level < 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Rockbiter Weapon");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Rockbiter Weapon"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Flametongue Weapon") && me.Level > 40 && !hasAnyOffhandEnchantment)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Flametongue Weapon on Offhand");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Flametongue Weapon"))
-            {
-                return true;
-            }
-        }
+
+
         if (Api.Spellbook.CanCast("Lightning Shield") && !me.Auras.Contains("Lightning Shield") && mana > 30)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -196,21 +144,8 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (!target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Lightning Bolt") && healthPercentage > 50 && mana > 20 && targetDistance > 25)
 
-
-
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Lightning Bolt");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Lightning Bolt"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Totemic Recall") && (me.Auras.Contains("Stoneskin",false) || me.Auras.Contains("Windfury Totem",false)))
+        if (Api.Spellbook.CanCast("Totemic Recall") && (me.Auras.Contains("Stoneskin", false) || me.Auras.Contains("Windfury Totem", false)))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Totemic Recall");
@@ -244,17 +179,17 @@ public class EnhaShamanWOTLK : Rotation
         var targetDistance = target.Position.Distance2D(me.Position);
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Stoneskin Totem") && !me.Auras.Contains("Stoneskin",false) && mana > 50)
+        if (Api.Spellbook.CanCast("Strength of Earth Totem") && !me.Auras.Contains("Strength of Earth", false) && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Stoneskin Totem");
+            Console.WriteLine("Casting Strength of Earth Totem");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Stoneskin Totem"))
+            if (Api.Spellbook.Cast("Strength of Earth Totem"))
             {
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem",false) && mana > 50)
+        if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem", false) && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Windfury Totem");
@@ -294,7 +229,7 @@ public class EnhaShamanWOTLK : Rotation
             }
         }
         else
-        if (Api.Spellbook.CanCast("Water Shield") && !me.Auras.Contains("Water Shield") &&  mana < 50)
+        if (Api.Spellbook.CanCast("Water Shield") && !me.Auras.Contains("Water Shield") && mana < 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Water Shield");
@@ -304,7 +239,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 50 && me.Auras.GetStacks("Maelstrom Weapon") == 5)
+        if (Api.Spellbook.CanCast("Healing Wave") && healthPercentage <= 50 )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Healing Wave");
@@ -324,27 +259,9 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Shamanistic Rage") && !Api.Spellbook.OnCooldown("Shamanistic Rage"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shamanistic Rage");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Shamanistic Rage"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Feral Spirit") && !Api.Spellbook.OnCooldown("Feral Spirit"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Feral Spirit");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Feral Spirit"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Wind Shear") && !Api.Spellbook.OnCooldown("Wind Shear") && targetDistance<= 25 && (target.IsCasting() || target.IsChanneling()))
+
+
+        if (Api.Spellbook.CanCast("Wind Shear") && !Api.Spellbook.OnCooldown("Wind Shear") && targetDistance <= 25 && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Wind Shear");
@@ -354,6 +271,7 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
+        else
         if (Api.Spellbook.CanCast("Earth Shock") && !Api.Spellbook.OnCooldown("Earth Shock") && targetDistance <= 25 && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -364,6 +282,30 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
+
+
+        if (Api.Spellbook.CanCast("Lightning Bolt") && me.Auras.Contains("Maelstrom Weapon") && me.Auras.GetStacks("Maelstrom Weapon") == 5)
+
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Lightning Bolt with 5 Maelstrom Weapon");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Lightning Bolt"))
+            {
+                return true;
+            }
+        }
+        if (Api.Spellbook.CanCast("Lava Lash") && !Api.Spellbook.OnCooldown("Lava Lash"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Lava Lash");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Lava Lash"))
+            {
+                return true;
+            }
+        }
+
         if (Api.Spellbook.CanCast("Flame Shock") && !Api.Spellbook.OnCooldown("Flame Shock") && !target.Auras.Contains("Flame Shock"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -373,54 +315,32 @@ public class EnhaShamanWOTLK : Rotation
             {
                 return true;
             }
-
-            if (Api.Spellbook.CanCast("Lightning Bolt") && me.Auras.GetStacks("Maelstrom Weapon") == 5)
-
+        }
+        if (Api.Spellbook.CanCast("Stormstrike") && !Api.Spellbook.OnCooldown("Stormstrike"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Stormstrike");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Stormstrike"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Lightning Bolt");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Lightning Bolt"))
-                {
-                    return true;
-                }
+                return true;
             }
-            if (Api.Spellbook.CanCast("Lava Lash") && !Api.Spellbook.OnCooldown("Lava Lash"))
+        }
+        if (Api.Spellbook.CanCast("Auto Attack"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Attack");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Auto Attack"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Lava Lash");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Lava Lash"))
-                {
-                    return true;
-                }
-            }
-
-
-            if (Api.Spellbook.CanCast("Stormstrike") && !Api.Spellbook.OnCooldown("Stormstrike"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Stormstrike");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Stormstrike"))
-                {
-                    return true;
-                }
-            }
-            if (Api.Spellbook.CanCast("Auto Attack"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Attack");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Auto Attack"))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
+
         return base.CombatPulse();
     }
+
     private void LogPlayerStats()
     {
         // Variables for player and target instances
