@@ -189,6 +189,16 @@ public class EnhaShamanWOTLK : Rotation
                 return true;
             }
         }
+        if (Api.Spellbook.CanCast("Earth Elemental Totem") && !Api.Spellbook.OnCooldown("Earth Elemental Totem"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Earth Elemental Totem");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Earth Elemental Totem"))
+            {
+                return true;
+            }
+        }
         if (Api.Spellbook.CanCast("Windfury Totem") && !me.Auras.Contains("Windfury Totem", false) && mana > 50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
