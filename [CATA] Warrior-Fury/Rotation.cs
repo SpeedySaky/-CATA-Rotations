@@ -44,7 +44,7 @@ public class ZerkWarr : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 800;
+        SlowTick = 1200;
         FastTick = 400;
 
         // You can also use this method to add to various action lists.
@@ -77,12 +77,12 @@ public class ZerkWarr : Rotation
             LogPlayerStats();
             lastDebugTime = DateTime.Now;
         }
-        if (Api.Spellbook.CanCast("Berserker Stance") && !me.Auras.Contains("Berserker Stance", false))
+        if (Api.Spellbook.CanCast("Battle Stance") && !me.Auras.Contains("Battle Stance", false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Berserker Stance");
+            Console.WriteLine("Casting Battle Stance");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Berserker Stance"))
+            if (Api.Spellbook.Cast("Battle Stance"))
 
                 return true;
         }
@@ -91,7 +91,7 @@ public class ZerkWarr : Rotation
 
         var reaction = me.GetReaction(target);
 
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Charge") && targetDistance <= 25)
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Charge") && targetDistance <= 25 && targetDistance >= 8)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Charge");
@@ -138,8 +138,16 @@ public class ZerkWarr : Rotation
         }
 
 
+        if (Api.Spellbook.CanCast("Berserker Stance") && !me.Auras.Contains("Berserker Stance", false))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Berserker Stance");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Berserker Stance"))
 
-        if (Api.Spellbook.CanCast("Berserker Rage") && !me.Auras.Contains("Berserker Rage", false) && !Api.Spellbook.OnCooldown("Berserker Rage") && rage < 15 && healthPercentage <= 30)
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Berserker Rage") && !me.Auras.Contains("Enrage") && !Api.Spellbook.OnCooldown("Berserker Rage"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Berserker Rage");
@@ -158,7 +166,7 @@ public class ZerkWarr : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Battle Shout") && !me.Auras.Contains("Battle Shout") && rage >= 15)
+        if (Api.Spellbook.CanCast("Battle Shout") && !me.Auras.Contains("Battle Shout"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Battle Shout");
@@ -167,7 +175,7 @@ public class ZerkWarr : Rotation
             if (Api.Spellbook.Cast("Battle Shout"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 15)
+        if (Api.Spellbook.CanCast("Pummel") && (target.IsCasting() || target.IsChanneling()) && rage >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Pummel");
@@ -177,18 +185,6 @@ public class ZerkWarr : Rotation
                 return true;
         }
 
-
-       
-        if (healthPercentage >= 80 && Api.Spellbook.CanCast("Bloodrage") && !Api.Spellbook.OnCooldown("Bloodrage")) //Last Stand and Shield wall
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Bloodrage");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Bloodrage"))
-            {
-                return true;
-            }
-        }
         if (healthPercentage >= 30 && Api.Spellbook.CanCast("Death Wish") && !Api.Spellbook.OnCooldown("Death Wish")) //Last Stand and Shield wall
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -208,7 +204,16 @@ public class ZerkWarr : Rotation
 
                 return true;
         }
-      
+        if (Api.Spellbook.CanCast("Victory Rush") && me.Auras.Contains("Victorious"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Victory Rush");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Victory Rush"))
+
+                return true;
+        }
+
         if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness")) //Last Stand and Shield wall
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -220,7 +225,7 @@ public class ZerkWarr : Rotation
             }
         } 
        
-        if (Api.Spellbook.CanCast("Whirlwind") && !Api.Spellbook.OnCooldown("Whirlwind") && rage >= 25)
+        if (Api.Spellbook.CanCast("Whirlwind") && !Api.Spellbook.OnCooldown("Whirlwind") && rage >= 25 && Api.UnfriendlyUnitsNearby(5,true)>=2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Whirlwind");
@@ -229,7 +234,16 @@ public class ZerkWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Bloodthirst") && !Api.Spellbook.OnCooldown("Bloodthirst") && rage >= 30)
+        if (Api.Spellbook.CanCast("Cleave") && !Api.Spellbook.OnCooldown("Cleave") && rage >= 30 && Api.UnfriendlyUnitsNearby(5, true) >= 2)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Cleave");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Cleave"))
+
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Bloodthirst") && !Api.Spellbook.OnCooldown("Bloodthirst") && rage >= 20 && me.Auras.Contains("Bloodthirst"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Bloodthirst");
@@ -238,12 +252,12 @@ public class ZerkWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Slam") && !Api.Spellbook.OnCooldown("Slam") && rage >= 15 && me.Auras.Contains("Bloodsurge"))
+        if (Api.Spellbook.CanCast("Raging Blow") && rage >= 20 && !Api.Spellbook.OnCooldown("Raging Blow") && (me.Auras.Contains("Enrage") || me.Auras.Contains("Berserker Rage") || me.Auras.Contains("Death Wish")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Slam");
+            Console.WriteLine("Casting Raging Blow");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Slam"))
+            if (Api.Spellbook.Cast("Raging Blow"))
 
                 return true;
         }
@@ -274,22 +288,8 @@ public class ZerkWarr : Rotation
 
                 return true;
         }
-        if (Api.Spellbook.CanCast("Attack"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Attack");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Attack"))
-                return true;
-        }
-
-
-
-
-
-
-
+     
+     
 
         return base.CombatPulse();
     }
