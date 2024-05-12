@@ -46,8 +46,8 @@ public class FireMageWotlk : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 800;
-        FastTick = 200;
+        SlowTick = 1200;
+        FastTick = 400;
 
         // You can also use this method to add to various action lists.
 
@@ -86,48 +86,7 @@ public class FireMageWotlk : Rotation
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
-        string[] waterTypes = { "Conjured Mana Strudel", "Conjured Mountain Spring Water", "Conjured Crystal Water", "Conjured Sparkling Water", "Conjured Mineral Water", "Conjured Spring Water", "Conjured Purified Water", "Conjured Fresh Water", "Conjured Water" };
-        string[] foodTypes = { "Conjured Mana Strudel", "Conjured Cinnamon Roll", "Conjured Sweet Roll", "Conjured Sourdough", "Conjured Pumpernickel", "Conjured Rye", "Conjured Bread", "Conjured Muffin" };
-
-        bool needsWater = true;
-        bool needsFood = true;
-        foreach (string waterType in waterTypes)
-        {
-            if (HasItem(waterType))
-            {
-                needsWater = false;
-                break;
-            }
-        }
-
-        foreach (string foodType in foodTypes)
-        {
-            if (HasItem(foodType))
-            {
-                needsFood = false;
-                break;
-            }
-        }
-        string[] GemTypes = { "Mana Agate", "Mana Sapphire", "Mana Emerald", "Mana Ruby", "Mana Citrine", "Mana Jade" };
-        bool needsgem = true;
-
-        foreach (string gemType in GemTypes)
-        {
-            if (HasItem(gemType))
-            {
-                needsgem = false;
-                break;
-            }
-        }
-        if (Api.Spellbook.CanCast("Conjure Mana Gem") && needsgem)
-        {
-            if (Api.Spellbook.Cast("Conjure Mana Gem"))
-            {
-                Console.WriteLine("Conjure Mana Gem.");
-                // Add further actions if needed after conjuring water
-            }
-        }
-        if (Api.Spellbook.CanCast("Conjure Refreshment") && (needsWater || needsFood))
+        if (Api.Spellbook.CanCast("Conjure Refreshment") && !HasItem("Conjured Mana Cake"))
         {
             if (Api.Spellbook.Cast("Conjure Refreshment"))
             {
@@ -135,24 +94,24 @@ public class FireMageWotlk : Rotation
                 // Add further actions if needed after conjuring water
             }
         }
-        if (Api.Spellbook.CanCast("Mage Armor") && !me.Auras.Contains("Mage Armor"))
+        if (Api.Spellbook.CanCast("Conjure Mana Gem") && !HasItem("Mana Gem"))
+        {
+            if (Api.Spellbook.Cast("Conjure Mana Gem"))
+            {
+                Console.WriteLine("Conjured Mana Gem.");
+                // Add further actions if needed after conjuring Mana Gem
+            }
+        }
+        if (Api.Spellbook.CanCast("Molten Armor") && !me.Auras.Contains("Molten Armor"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Mage Armor");
+            Console.WriteLine("Casting Molten Armor");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Mage Armor"))
+            if (Api.Spellbook.Cast("Molten Armor"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Frost Armor") && !me.Auras.Contains("Frost Armor") && !me.Auras.Contains("Mage Armor"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Frost Armor");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Frost Armor"))
-                return true;
-        }
+        
         if (Api.Spellbook.CanCast("Amplify Magic") && !me.Auras.Contains("Amplify Magic"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -162,13 +121,13 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Amplify Magic"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Arcane Intellect") && !me.Auras.Contains("Arcane Intellect"))
+        if (Api.Spellbook.CanCast("Arcane Brilliance") && !me.Auras.Contains("Arcane Brilliance"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Arcane Intellect");
+            Console.WriteLine("Casting Arcane Brilliance");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Arcane Intellect"))
+            if (Api.Spellbook.Cast("Arcane Brilliance"))
                 return true;
         }
 
@@ -176,63 +135,31 @@ public class FireMageWotlk : Rotation
 
 
 
-        // Now needsWater variable will indicate if the character needs water
-        if (needsWater)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Character needs water!");
-            Console.ResetColor();
-
-            // Add logic here to conjure water or perform any action needed to acquire water
-            // Example: Cast "Conjure Water" spell
-            // Assuming the API allows for conjuring water in a similar way to casting spells
-            if (Api.Spellbook.CanCast("Conjure Water"))
-            {
-                if (Api.Spellbook.Cast("Conjure Water"))
-                {
-                    Console.WriteLine("Conjured water.");
-                    // Add further actions if needed after conjuring water
-                }
-            }
-        }
-
-        // Now needsWater variable will indicate if the character needs food
-        if (needsFood)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Character needs food!");
-            Console.ResetColor();
-
-            // Add logic here to conjure water or perform any action needed to acquire food
-            // Example: Cast "Conjure food" spell
-            // Assuming the API allows for conjuring food in a similar way to casting spells
-            if (Api.Spellbook.CanCast("Conjure Food"))
-            {
-                if (Api.Spellbook.Cast("Conjure Food"))
-                {
-                    Console.WriteLine("Conjured Food.");
-                    // Add further actions if needed after conjuring water
-                }
-
-            }
-        }
+       
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
             mana > 20 && !IsNPC(target))
         {
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Pulling with Frostbolt");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Frostbolt"))
+            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") && !Api.Spellbook.OnCooldown("Pyroblast"))
             {
-                return true;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Pyroblast");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Pyroblast"))
+                    return true;
             }
 
             else
             {
-                // Handle if the target is friendly
-                Console.WriteLine("Target is friendly. Skipping Pulling.");
+                if (Api.Spellbook.CanCast("Frostbolt") && !target.Auras.Contains("Frostbolt") && !Api.Spellbook.OnCooldown("Frostbolt"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Frostbolt");
+                    Console.ResetColor();
+
+                    if (Api.Spellbook.Cast("Frostbolt"))
+                        return true;
+                }
             }
         }
        
@@ -256,25 +183,15 @@ public class FireMageWotlk : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-        string[] GemTypes = { "Mana Jade", "Mana Citrine", "Mana Ruby", "Mana Emerald", "Mana Sapphire", "Mana Agate" };
-
-        foreach (string gem in GemTypes)
+        if (Api.Spellbook.CanCast("Conjure Mana Gem") && !HasItem("Mana Gem"))
         {
-            if (mana <= 50 && !Api.Inventory.OnCooldown(gem) && HasItem(gem))
+            if (Api.Spellbook.Cast("Conjure Mana Gem"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Using {gem} for mana");
-                Console.ResetColor();
-
-                if (Api.Inventory.Use(gem))
-                {
-                    return true;
-                }
+                Console.WriteLine("Conjured Mana Gem.");
+                // Add further actions if needed after conjuring Mana Gem
             }
         }
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling()) return false;
-        if (me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
 
@@ -297,6 +214,15 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Evocation"))
                 return true;
         }
+        if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") )
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Combustion");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Combustion"))
+                return true;
+        }
         if (Api.Spellbook.CanCast("Counterspell") && !Api.Spellbook.OnCooldown("Counterspell") && (target.IsCasting() || target.IsChanneling()))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -307,18 +233,16 @@ public class FireMageWotlk : Rotation
                 return true;
             }
         }
-
-
-        if (Api.Spellbook.CanCast("Combustion") && !me.Auras.Contains(28682) && !Api.Spellbook.OnCooldown("Combustion"))
+        if (Api.Spellbook.CanCast("Flame Orb") && !Api.Spellbook.OnCooldown("Flame Orb") && !Api.Spellbook.OnCooldown("Flame Orb"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Combustion");
+            Console.WriteLine("Casting Flame Orb");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Combustion"))
+            if (Api.Spellbook.Cast("Flame Orb"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Living Bomb") && mana >= 22 && !target.Auras.Contains("Living Bomb") && targethealth >= 30 && !Api.Spellbook.OnCooldown("Living Bomb"))
+        if (Api.Spellbook.CanCast("Living Bomb") && !target.Auras.Contains("Living Bomb") && !Api.Spellbook.OnCooldown("Living Bomb"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Living Bomb");
@@ -327,8 +251,7 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Living Bomb"))
                 return true;
         }
-
-        if (me.Auras.Contains("Hot Streak") && mana >= 22 && !target.Auras.Contains("Pyroblast") && targethealth >= 20)
+        if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") && !Api.Spellbook.OnCooldown("Pyroblast"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Pyroblast");
@@ -337,6 +260,7 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Pyroblast"))
                 return true;
         }
+               
         if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast") && targetDistance<24)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -344,6 +268,15 @@ public class FireMageWotlk : Rotation
             Console.ResetColor();
 
             if (Api.Spellbook.Cast("Fire Blast"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Scorch")  && !Api.Spellbook.OnCooldown("Scorch"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Scorch");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Scorch"))
                 return true;
         }
         if (Api.Spellbook.CanCast("Fireball") && mana >= 19 && targethealth > 20)
@@ -477,34 +410,6 @@ public class FireMageWotlk : Rotation
             Console.WriteLine($"Have Combustion Auras.Contains");
             Console.ResetColor();
         }
-        ShadowApi shadowApi = new ShadowApi();
-
-        // Define food and water types
-        string[] waterTypes = { "Conjured Mana Strudel", "Conjured Mountain Spring Water", "Conjured Crystal Water", "Conjured Sparkling Water", "Conjured Mineral Water", "Conjured Spring Water", "Conjured Purified Water", "Conjured Fresh Water", "Conjured Water" };
-        string[] foodTypes = { "Conjured Mana Strudel", "Conjured Cinnamon Roll", "Conjured Sweet Roll", "Conjured Sourdough", "Conjured Pumpernickel", "Conjured Rye", "Conjured Bread", "Conjured Muffin" };
-
-        // Count food items in the inventory
-        int foodCount = 0;
-        foreach (string foodType in foodTypes)
-        {
-            int count = Api.Inventory.ItemCount(foodType);
-            foodCount += count;
-        }
-
-        // Count water items in the inventory
-        int waterCount = 0;
-        foreach (string waterType in waterTypes)
-        {
-            int count = Api.Inventory.ItemCount(waterType);
-            waterCount += count;
-        }
-
-        // Display the counts of food and water items
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Current Food Count: " + foodCount);
-        Console.WriteLine("Current Water Count: " + waterCount);
-        Console.ResetColor();
-
 
 
         Console.ResetColor();
