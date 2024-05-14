@@ -214,7 +214,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && (targetCreatureType == CreatureType.Undead || targetCreatureType == CreatureType.Demon))
+        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && mana > 70 && (targetCreatureType == CreatureType.Undead || targetCreatureType == CreatureType.Demon))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Exorcism on Demon or Undead");
@@ -224,10 +224,10 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && mana > 50)
+        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && mana > 70)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Exorcism with >50 mana");
+            Console.WriteLine("Casting Exorcism with >70 mana");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Exorcism"))
             {
@@ -255,51 +255,6 @@ public class RetPalaWOTLK : Rotation
             if (Api.Spellbook.Cast("Seal of Truth"))
             {
                 return true;
-            }
-        }
-        else if (Api.Spellbook.CanCast("Seal of Command") && !Api.Player.Auras.Contains("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Command"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Seal of Command");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Seal of Command"))
-            {
-                return true;
-            }
-        }
-        else if (Api.Spellbook.CanCast("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Command") && !Api.Player.Auras.Contains("Seal of Truth"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Seal of Righteousness");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Seal of Righteousness"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Judgement of Wisdom") && !Api.Target.Auras.Contains("Judgement of Wisdom") && !Api.Spellbook.OnCooldown("Judgement of Wisdom") && healthPercentage >= 50)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Judgement of Wisdom");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Judgement of Wisdom"))
-            {
-                return true;
-            }
-        }
-        else if (!Api.Target.Auras.Contains("Judgement of Wisdom") && !Api.Spellbook.OnCooldown("Judgement of Wisdom"))
-        {
-            if (Api.Spellbook.CanCast("Judgement of Light") && !Api.Spellbook.OnCooldown("Judgement of Light") && !Api.Target.Auras.Contains("Judgement of Light"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Judgement of Light");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Judgement of Light"))
-                {
-                    return true;
-                }
             }
         }
 

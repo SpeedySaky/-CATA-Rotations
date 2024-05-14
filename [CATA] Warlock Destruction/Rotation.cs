@@ -5,13 +5,11 @@ using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
-using wShadow.Warcraft.Usefuls;
 
 
 
 
-
-public class DestroLockWOTLK : Rotation
+public class DestroLock : Rotation
 {
     private List<string> npcConditions = new List<string>
     {
@@ -63,8 +61,8 @@ public class DestroLockWOTLK : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 600;
-        FastTick = 200;
+        SlowTick = 1200;
+        FastTick = 400;
 
         // You can also use this method to add to various action lists.
 
@@ -87,9 +85,9 @@ public class DestroLockWOTLK : Rotation
         var me = Api.Player;
         var target = Api.Target;
         var mana = me.ManaPercent;
-        var pet = me.Pet();
         var healthPercentage = me.HealthPercent;
         var targethealth = target.HealthPercent;
+        var pet = me.Pet();
         var PetHealth = 0.0f;
         if (IsValid(pet))
         {
@@ -100,7 +98,6 @@ public class DestroLockWOTLK : Rotation
         {
             TargetHealth = target.HealthPercent;
         }
-        ShadowApi shadowApi = new ShadowApi();
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -115,20 +112,9 @@ public class DestroLockWOTLK : Rotation
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
 
-        bool needsHealthstone = true;
 
-        foreach (string healthstoneType in healthstoneTypes)
-        {
-            if (HasItem(healthstoneType))
-            {
-                needsHealthstone = false;
-                break;
-            }
-        }
-
-        if (needsHealthstone && HasItem("Soul Shard") && Api.Spellbook.HasLearned("Create Healthstone") && Api.Spellbook.CanCast("Create Healthstone"))
+        if (!HasItem("Healthstone") && Api.Spellbook.CanCast("Create Healthstone"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Create Healthstone");
@@ -151,6 +137,7 @@ public class DestroLockWOTLK : Rotation
                 return true;
             }
         }
+       
         if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor",false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -161,8 +148,7 @@ public class DestroLockWOTLK : Rotation
                 return true;
             }
         }
-
-        if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor",false) && !me.Auras.Contains("Demon Armor",false))
+        else if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor", false) && !me.Auras.Contains("Demon Armor", false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demon Armor");
@@ -172,8 +158,7 @@ public class DestroLockWOTLK : Rotation
                 return true;
             }
         }
-
-        if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor",false) && !me.Auras.Contains("Demon Armor",false) && !me.Auras.Contains("Demon Skin",false))
+        else if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor", false) && !me.Auras.Contains("Demon Armor", false) && !me.Auras.Contains("Demon Skin", false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Demon Skin");
@@ -185,7 +170,7 @@ public class DestroLockWOTLK : Rotation
         }
 
 
-        if (PetHealth < 50 && healthPercentage > 50 && Api.Spellbook.CanCast("Health Funnel"))
+        if (IsValid(pet) && PetHealth < 50 && healthPercentage > 50 && Api.Spellbook.CanCast("Health Funnel"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Healing Pet ");
@@ -195,29 +180,40 @@ public class DestroLockWOTLK : Rotation
                 return true;
         }
 
-        if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Voidwalker") && HasItem("Soul Shard") && mana > 30)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Summon VoidWalker.");
-            Console.ResetColor();
+        //if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Voidwalker") )
+        // {
+        //  Console.ForegroundColor = ConsoleColor.Green;
+        //  Console.WriteLine("Casting Summon VoidWalker.");
+        //  Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Summon Voidwalker"))
-            {
-                return true;
-            }
-        }
-        else if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Imp") && !Api.Spellbook.CanCast("Summon Voidwalker") && mana > 30)
+        // if (Api.Spellbook.Cast("Summon Voidwalker"))
+        //{
+        // return true;
+        // }
+        //  }
+       if (!IsValid(pet)  )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Summon Imp.");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Summon Imp"))
+            if (Api.UseMacro("Imp"))
             {
                 return true;
             }
         }
 
+
+        if (Api.Spellbook.CanCast("Soul Link") && !me.Auras.Contains("Soul Link", false) && IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Soul Link");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Soul Link"))
+            {
+                return true;
+            }
+        }
         if (Api.HasMacro("Combat") && !target.IsDead() && !IsNPC(target))
 
         //macro needed
@@ -285,29 +281,27 @@ public class DestroLockWOTLK : Rotation
                 // without triggering a premature exit
             }
         }
-        if (Api.Spellbook.CanCast("Drain Soula") && Api.Inventory.ItemCount("Soul Shard") <= 31 && targethealth <= 20)
+        if (Api.Spellbook.CanCast("Drain Soul") && Api.Inventory.ItemCount("Soul Shard") <= 1 && targethealth <= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Drain Soul");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Drain Soula"))
+            if (Api.Spellbook.Cast("Drain Soul"))
             {
                 return true;
             }
         }
-        string[] healthstoneTypes = { "Minor Healthstone", "Lesser Healthstone", "Healthstone", "Greater Healthstone", "Major Healthstone", "Master Healthstone", "Demonic Healthstone", "Fel Healthstone" };
 
 
-        foreach (string healthstoneType in healthstoneTypes)
         {
-            if (Api.Inventory.HasItem(healthstoneType) && healthPercentage <= 40 && !Api.Inventory.OnCooldown(healthstoneType))
+            if (Api.Inventory.HasItem("Healthstone") && healthPercentage <= 40 && !Api.Inventory.OnCooldown("Healthstone"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Using {healthstoneType}");
+                Console.WriteLine($"Using Healthstone");
                 Console.ResetColor();
 
-                if (Api.Inventory.Use(healthstoneType))
+                if (Api.Inventory.Use("Healthstone"))
                 {
                     return true;
                 }
@@ -336,13 +330,13 @@ public class DestroLockWOTLK : Rotation
             if (Api.Spellbook.Cast("Health Funnel"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Haunt") && !target.Auras.Contains("Haunt"))
+        if (Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Haunt");
+            Console.WriteLine("Casting Immolate");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Haunt"))
+            if (Api.Spellbook.Cast("Immolate"))
                 return true;
         }
 
@@ -355,14 +349,31 @@ public class DestroLockWOTLK : Rotation
             if (Api.Spellbook.Cast("Drain Life"))
                 return true;
         }
-
-        if (Api.Spellbook.CanCast("Curse of Agony") && !target.Auras.Contains("Curse of Agony") && targethealth >= 30 && mana >= 10)
+        if (Api.Spellbook.CanCast("Shadowburn") && targethealth <= 15 )
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Curse of Agony");
+            Console.WriteLine("Casting Shadowburn");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Curse of Agony"))
+            if (Api.Spellbook.Cast("Shadowburn"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Shadow Bolt") && (me.Auras.HasBuff("Backlash") || me.Auras.Contains("Backlash")))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Shadow Bolt with Backlash");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Shadow Bolt"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Bane of Doom") && !target.Auras.Contains("Bane of Doom") && targethealth >= 30 && mana >= 10)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Bane of Doom");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Bane of Doom"))
                 return true;
         }
         if (Api.Spellbook.CanCast("Corruption") && !target.Auras.Contains("Corruption") && targethealth >= 30 && mana >= 10)
@@ -374,47 +385,16 @@ public class DestroLockWOTLK : Rotation
             if (Api.Spellbook.Cast("Corruption"))
                 return true;
         }
-
-        if (Api.Spellbook.CanCast("Unstable Affliction") && !target.Auras.Contains("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate") && targethealth >= 30 && mana >= 10)
+        if (Api.Spellbook.CanCast("Chaos Bolt") && !Api.Spellbook.OnCooldown("Chaos Bolt"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Unstable Affliction");
+            Console.WriteLine("Casting Chaos Bolt");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Unstable Affliction"))
+            if (Api.Spellbook.Cast("Chaos Bolt"))
                 return true;
         }
-
-        if (Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Unstable Affliction") && Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate") && targethealth >= 30 && mana >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Immolate");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Immolate"))
-                return true;
-        }
-        if (Api.Spellbook.CanCast("Conflagrate") && target.Auras.Contains("Immolate") && targethealth >= 40 && mana >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Conflagrate");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Conflagrate"))
-                return true;
-        }
-        if (Api.Spellbook.CanCast("Shadow Bolt") && me.Auras.Contains(17941) && mana >= 30)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shadow Bolt");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Shadow Bolt"))
-                return true;
-        }
-
-
-        if (Api.Spellbook.CanCast("Soul Fire") && targethealth >= 200 && mana >= 10 && Api.Inventory.ItemCount("Soul Shard") >= 2)
+        if (Api.Spellbook.CanCast("Soul Fire") && (!me.Auras.Contains("Improved Soul Fire") || me.Auras.Contains("Empowered Imp")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Soul Fire");
@@ -423,6 +403,26 @@ public class DestroLockWOTLK : Rotation
             if (Api.Spellbook.Cast("Soul Fire"))
                 return true;
         }
+        if (Api.Spellbook.CanCast("Conflagrate") && target.Auras.Contains("Immolate") && !Api.Spellbook.OnCooldown("Conflagrate"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Conflagrate");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Conflagrate"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Incinerate") && target.Auras.Contains("Immolate") )
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Incinerate");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Incinerate"))
+                return true;
+        }
+
+
         if (Api.Spellbook.CanCast("Shadow Bolt") && targethealth >= 30 && mana >= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -458,7 +458,12 @@ public class DestroLockWOTLK : Rotation
         // Target distance from the player
         var targetDistance = target.Position.Distance2D(me.Position);
 
-
+        var pet = me.Pet();
+        var PetHealth = 0.0f;
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana} Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");
@@ -477,11 +482,40 @@ public class DestroLockWOTLK : Rotation
 
         }
 
-
-
-
+        if (!IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Pet is not summoned.");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
+        else
+    if (IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Pet is summoned.");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
+        if (Api.Spellbook.CanCast("Summon"))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Can Cast Summon Imp.");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
+        if (Api.Spellbook.CanCast(688))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Can Cast 688");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
         Console.ResetColor();
     }
+
+
+   
     private bool IsNPC(WowUnit unit)
     {
         if (!IsValid(unit))
