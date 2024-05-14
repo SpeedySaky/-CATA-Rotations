@@ -10,8 +10,36 @@ using wShadow.Warcraft.Managers;
 public class PriestShadowWOTLK : Rotation
 {
 
-    private int debugInterval = 5; // Set the debug interval in seconds
+    private bool HasItem(object item)
+           => Api.Inventory.HasItem(item);
+
+
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    };
+    private int debugInterval = 30; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
+    public bool IsValid(WowUnit unit)
+    {
+        if (unit == null || unit.Address == null)
+        {
+            return false;
+        }
+        return true;
+    }
+    private CreatureType GetCreatureType(WowUnit unit)
+    {
+        return unit.Info.GetCreatureType();
+    }
+
+
+
+
 
     public override void Initialize()
     {
@@ -47,7 +75,14 @@ public class PriestShadowWOTLK : Rotation
         var me = Api.Player;
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        var target = Api.Target;
+
+        var targetDistance = target.Position.Distance2D(me.Position);
+        var reaction = me.GetReaction(target);
+
+        var targethealth = target.HealthPercent;
+
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -86,7 +121,7 @@ public class PriestShadowWOTLK : Rotation
                     return true;
                 }
             }
-            if (Api.Spellbook.CanCast("Vampiric Embrace") && !me.Auras.Contains("Vampiric Embrace"))
+            if (Api.Spellbook.CanCast("Vampiric Embrace") && !me.Auras.Contains("Vampiric Embrace",false))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Vampiric Embrace");
@@ -106,7 +141,7 @@ public class PriestShadowWOTLK : Rotation
                     return true;
                 }
             }
-            if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire"))
+            if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire",false))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Inner Fire");
@@ -126,7 +161,20 @@ public class PriestShadowWOTLK : Rotation
                     return true;
                 }
             }
-            return base.PassivePulse();
+
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+        {
+            if (Api.Spellbook.CanCast("Shadow Word: Pain") && targetDistance < 40 )
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Shadow Word: Pain");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Shadow Word: Pain"))
+                    return true;
+            }
+        }
+        return base.PassivePulse();
 
         }
 
@@ -180,7 +228,7 @@ public class PriestShadowWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Shadow Word: Pain") && !target.Auras.Contains("Shadow Word: Pain") && targethealth >= 30)
+        if (Api.Spellbook.CanCast("Shadow Word: Pain") && !target.Auras.Contains("Shadow Word: Pain") && targethealth >= 30 && mana >= 22)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shadow Word: Pain");
@@ -190,7 +238,7 @@ public class PriestShadowWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Shadow Word: Death") && !target.Auras.Contains("Shadow Word: Death") && targethealth <= 10)
+        if (Api.Spellbook.CanCast("Shadow Word: Death") && !target.Auras.Contains("Shadow Word: Death") && targethealth <= 10 && mana >= 12)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shadow Word: Death");
@@ -200,17 +248,7 @@ public class PriestShadowWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Vampiric Touch") && !target.Auras.Contains("Vampiric Touch") && targethealth >= 30)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Vampiric Touch");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Vampiric Touch"))
-            {
-                return true;
-            }
-        }
-        if (Api.Spellbook.CanCast("Devouring Plague") && !target.Auras.Contains("Devouring Plague") && targethealth >= 30)
+        if (Api.Spellbook.CanCast("Devouring Plague") && !target.Auras.Contains("Devouring Plague") && targethealth >= 30 && mana>=25)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Devouring Plague");
@@ -220,7 +258,7 @@ public class PriestShadowWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Mind Blast") && targethealth >= 30)
+        if (Api.Spellbook.CanCast("Mind Blast") && targethealth >= 30 && mana >= 17)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Mind Blast");
@@ -241,6 +279,34 @@ public class PriestShadowWOTLK : Rotation
             }
         }
         return base.CombatPulse();
+    }
+
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
+
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
     }
     private void LogPlayerStats()
     {
