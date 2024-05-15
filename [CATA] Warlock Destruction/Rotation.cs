@@ -137,8 +137,8 @@ public class DestroLock : Rotation
                 return true;
             }
         }
-       
-        if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor",false))
+
+        if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor", false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fel Armor");
@@ -191,13 +191,13 @@ public class DestroLock : Rotation
         // return true;
         // }
         //  }
-       if (!IsValid(pet)  )
+        if (!IsValid(pet))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Summon Imp.");
             Console.ResetColor();
 
-            if (Api.UseMacro("Imp"))
+            if (Api.Spellbook.Cast(688))
             {
                 return true;
             }
@@ -349,7 +349,7 @@ public class DestroLock : Rotation
             if (Api.Spellbook.Cast("Drain Life"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Shadowburn") && targethealth <= 15 )
+        if (Api.Spellbook.CanCast("Shadowburn") && targethealth <= 15)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shadowburn");
@@ -412,7 +412,7 @@ public class DestroLock : Rotation
             if (Api.Spellbook.Cast("Conflagrate"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Incinerate") && target.Auras.Contains("Immolate") )
+        if (Api.Spellbook.CanCast("Incinerate") && target.Auras.Contains("Immolate"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Incinerate");
@@ -515,7 +515,7 @@ public class DestroLock : Rotation
     }
 
 
-   
+
     private bool IsNPC(WowUnit unit)
     {
         if (!IsValid(unit))

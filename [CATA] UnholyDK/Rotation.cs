@@ -129,7 +129,6 @@ public class UnholyDK : Rotation
         if (IsValid(pet))
         {
             PetHealth = pet.HealthPercent;
-            int stackCount = pet.Auras.GetStacks("Horn of Winter");
     
         }
         if (!IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
