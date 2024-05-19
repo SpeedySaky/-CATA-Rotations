@@ -209,7 +209,7 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.HasSpell("Slice and Dice") && points >= 3 && !me.Auras.Contains("Slice and Dice") && energy >= 25)
+        if (Api.Spellbook.CanCast("Slice and Dice") && points >= 3 && !me.Auras.Contains("Slice and Dice") && energy >= 25)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Slice and Dice ");
