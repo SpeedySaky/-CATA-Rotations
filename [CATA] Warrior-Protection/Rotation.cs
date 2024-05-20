@@ -172,6 +172,14 @@ public class ProtWarr : Rotation
             if (Api.Spellbook.Cast("Demoralizing Shout"))
                 return true;
         }
+        if (Api.Spellbook.CanCast("Battle Shout") && !me.Auras.Contains("Battle Shout"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Battle Shout");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Battle Shout"))
+                return true;
+        }
 
         // Use Commanding Shout for Rage as needed
         if (Api.Spellbook.CanCast("Commanding Shout") && !me.Auras.Contains("Commanding Shout") && rage < 60)

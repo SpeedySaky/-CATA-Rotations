@@ -31,8 +31,8 @@ public class UnholyDK : Rotation
     }
     public override void Initialize()
     {
-        SlowTick = 600;
-        FastTick = 200;
+        SlowTick = 800;
+        FastTick = 400;
 
         PassiveActions.Add((true, () => false));
         CombatActions.Add((true, () => false));
