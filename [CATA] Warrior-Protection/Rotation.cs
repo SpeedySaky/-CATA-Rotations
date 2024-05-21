@@ -259,25 +259,7 @@ public class ProtWarr : Rotation
                 return true;
         }
 
-        // Use Shattering Throw on 5-minute cooldown with raid cooldowns such as Bloodlust
-        if (Api.Spellbook.CanCast("Shattering Throw") && !Api.Spellbook.OnCooldown("Shattering Throw") && rage >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shattering Throw");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Shattering Throw"))
-                return true;
-        }
-
-        // Use Recklessness on 5-minute cooldown with major cooldowns such as Bloodlust, ideally when you are not currently tanking
-        if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness") && rage >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Recklessness");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Recklessness"))
-                return true;
-        }
+        
         // AoE rotation
         if (enemiesNearby >= 2)
         {

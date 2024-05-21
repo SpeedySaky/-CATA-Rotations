@@ -214,7 +214,7 @@ public class ZerkWarr : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness")) //Last Stand and Shield wall
+        if (Api.Spellbook.CanCast("Recklessness") && !Api.Spellbook.OnCooldown("Recklessness") && rage>=10) //Last Stand and Shield wall
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Recklessness");

@@ -55,24 +55,16 @@ public class UnholyDK : Rotation
         }
         LogPlayerStatsPeriodically();
 
-        if (!IsValid(pet) && me.Auras.Contains("Glyph of Raise Dead",false)  && Api.Spellbook.CanCast("Raise Dead"))
+        if (!IsValid(pet)  && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Raise Dead because we have the glyph.");
+            Console.WriteLine("Casting Raise Dead because we dont have pet.");
             // Console.ResetColor();
 
             if (Api.Spellbook.Cast("Raise Dead"))
                 return true;
         }
-        else if (HasItem("Corpse Dust") && !IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Raise Dead with Corpse Dust as we don't have the glyph.");
-            // Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Raise Dead"))
-                return true;
-        }
+        
         if (Api.Spellbook.CanCast("Horn of Winter") && !me.Auras.Contains("Horn of Winter"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -131,16 +123,17 @@ public class UnholyDK : Rotation
             PetHealth = pet.HealthPercent;
     
         }
+
         if (!IsValid(pet) && Api.Spellbook.CanCast("Raise Dead"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Raise Dead.");
+            Console.WriteLine("Casting Raise Dead because we dont have pet.");
             // Console.ResetColor();
 
             if (Api.Spellbook.Cast("Raise Dead"))
                 return true;
         }
-      
+
 
 
         if (Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
