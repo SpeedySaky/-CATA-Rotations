@@ -224,16 +224,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && mana > 70)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Exorcism with >70 mana");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Exorcism"))
-            {
-                return true;
-            }
-        }
+       
         if (Api.Spellbook.CanCast("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
