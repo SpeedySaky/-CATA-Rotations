@@ -287,7 +287,7 @@ public class AfflictionLock : Rotation
                 return true;
             }
         }
-        if (!IsValid(pet))
+        if (!IsValid(pet) && mana>50)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Summon Imp.");
@@ -373,7 +373,7 @@ public class AfflictionLock : Rotation
                 return true;
         }
         // Affliction Warlock rotation
-        if (Api.Spellbook.CanCast("Haunt") && !target.Auras.Contains("Haunt") && !Api.Spellbook.OnCooldown("Haunt"))
+        if (Api.Spellbook.CanCast("Haunt") && !target.Auras.Contains("Haunt") && !Api.Spellbook.OnCooldown("Haunt") && mana>10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Haunt");
@@ -383,7 +383,7 @@ public class AfflictionLock : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Unstable Affliction") && !target.Auras.Contains("Unstable Affliction"))
+        if (Api.Spellbook.CanCast("Unstable Affliction") && !target.Auras.Contains("Unstable Affliction") && mana > 10  )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Unstable Affliction");
@@ -393,7 +393,7 @@ public class AfflictionLock : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Corruption") && !target.Auras.Contains("Corruption"))
+        if (Api.Spellbook.CanCast("Corruption") && !target.Auras.Contains("Corruption") && mana > 5)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Corruption");
@@ -402,16 +402,16 @@ public class AfflictionLock : Rotation
             if (Api.Spellbook.Cast("Corruption"))
                 return true;
         }
-        if (Api.Spellbook.CanCast(603) && !target.Auras.Contains("Bane of Doom") && targethealth >= 30 && mana >= 10)
+        if (Api.Spellbook.CanCast(980) && !target.Auras.Contains("Bane of Agony") && targethealth >= 30 && mana >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Bane of Doom");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast(603))
+            if (Api.Spellbook.Cast(980))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Curse of Agony") && !target.Auras.Contains("Curse of Agony"))
+        if (Api.Spellbook.CanCast("Curse of Agony") && !target.Auras.Contains("Curse of Agony") && mana > 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Curse of Agony");
