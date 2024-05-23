@@ -89,7 +89,7 @@ public class BMhunterWOTLK : Rotation
         // Variables for player and target instances
         var me = Api.Player;
         var target = Api.Target;
-        var mana = me.ManaPercent;
+        var focus = me.FocusPercent;
         var pet = me.Pet();
         var PetHealth = 0.0f;
         if (IsValid(pet))
@@ -113,14 +113,14 @@ public class BMhunterWOTLK : Rotation
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Aspect of the Cheetah") && !me.Auras.Contains("Aspect of the Cheetah", false))
+        if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk", false))
 
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Aspect of the Cheetah");
+            Console.WriteLine("Casting Aspect of the Hawk");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Aspect of the Cheetah"))
+            if (Api.Spellbook.Cast("Aspect of the Hawk"))
 
                 return true;
 
@@ -139,7 +139,7 @@ public class BMhunterWOTLK : Rotation
             }
         }
         // Additional actions for when the pet is dead
-        if (!IsValid(pet) && Api.Spellbook.CanCast("Revive Pet"))
+        if (!IsValid(pet) && Api.Spellbook.CanCast("Revive Pet") && focus > 35)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Casting Revive Pet");
@@ -150,29 +150,7 @@ public class BMhunterWOTLK : Rotation
                 return true;
             }
         }
-
-        if (IsValid(pet) && (DateTime.Now - lastFeedTime).TotalMinutes >= 10 && Api.HasMacro("Feed"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Feeding pet.");
-            Console.ResetColor();
-
-            if (Api.UseMacro("Feed"))
-            {
-                lastFeedTime = DateTime.Now; // Update lastFeedTime
-
-                // Log the estimated time until the next feeding attempt
-                var nextFeedTime = lastFeedTime.AddMinutes(10);
-                var timeUntilNextFeed = nextFeedTime - DateTime.Now;
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Next feed pet in: {timeUntilNextFeed.TotalMinutes} minutes.");
-                Console.ResetColor();
-
-                return true;
-            }
-        }
-        if (IsValid(pet) && PetHealth < 40 && Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet") && mana > 10)
+        if (IsValid(pet) && PetHealth < 70 && Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet"))
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Pet health is low healing him");
@@ -181,42 +159,6 @@ public class BMhunterWOTLK : Rotation
 
                 return true;
         }
-        if (IsValid(pet) && PetHealth < 40 && Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet") && mana > 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Pet health is low healing him");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Mend Pet"))
-
-                return true;
-        }
-        if (Api.Spellbook.CanCast("Aspect of the Hawk") && !me.Auras.Contains("Aspect of the Hawk", false) && !me.IsMounted() && !me.Auras.Contains("Aspect of the Cheetah", false))
-
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Aspect of the Hawk");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Aspect of the Hawk"))
-
-                return true;
-        }
-        if (!target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Hunter's Mark") && !target.Auras.Contains("Hunter's Mark") && healthPercentage > 50 && mana > 20 && PetHealth > 50)
-
-
-
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Mark");
-            Console.ResetColor();
-
-            if (Api.UseMacro("Mark"))
-            {
-                lastMarkLogTime = DateTime.Now; // Update the lastMarkTime after successful casting
-                return true;
-            }
-        }
-
         return base.PassivePulse();
 
     }
@@ -226,7 +168,7 @@ public class BMhunterWOTLK : Rotation
         // Variables for player and target instances
         var me = Api.Player;
         var target = Api.Target;
-        var mana = me.ManaPercent;
+        var focus = me.FocusPercent;
         var targethealth = target.HealthPercent;
         var healthPercentage = me.HealthPercent;
         var pet = me.Pet();
@@ -284,75 +226,52 @@ public class BMhunterWOTLK : Rotation
                 return true;
             }
         }
-        if (targetDistance <= 5)
+
+        if (Api.Spellbook.CanCast("Bestial Wrath") && Api.Spellbook.HasSpell("Bestial Wrath") && !Api.Spellbook.OnCooldown("Bestial Wrath") && IsValid(pet))
         {
-            if (Api.Spellbook.CanCast("Aspect of the Monkey") && !me.Auras.Contains("Aspect of the Monkey", false))
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Bestial Wrath");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Bestial Wrath"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Aspect of the Monkey");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Aspect of the Monkey"))
-                {
-                    return true;
-                }
-            }
-            // Insert other melee spells or abilities here
-
-
-
-            if (Api.Spellbook.CanCast("Mongoose Strike") && !Api.Spellbook.OnCooldown("Mongoose Strike"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Mongoose Strike");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Mongoose Strike"))
-                {
-                    return true;
-                }
-            }
-
-            if (Api.Spellbook.CanCast("Raptor Strike") && !Api.Spellbook.OnCooldown("Raptor Strike"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Raptor Strike");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Raptor Strike"))
-                {
-                    return true;
-                }
-            }
-
-            if (Api.UnfriendlyUnitsNearby(10, true) >= 2)
-            {
-                if (Api.Spellbook.CanCast("Explosive Shot") && !Api.Spellbook.OnCooldown("Explosive Shot"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Casting Explosive Shot");
-                    Console.ResetColor();
-
-                    if (Api.Spellbook.Cast("Explosive Shot"))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-
-            if (Api.Spellbook.CanCast("Immolation Trap") && !target.Auras.Contains("Immolation Trap") && !Api.Spellbook.OnCooldown("Immolation Trap"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Immolation Trap");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Immolation Trap"))
-                {
-                    return true;
-                }
+                return true;
             }
         }
+        if (Api.Spellbook.CanCast("Rapid Fire") && Api.Spellbook.HasSpell("Rapid Fire") && !Api.Spellbook.OnCooldown("Rapid Fire") && IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Rapid Fire");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Rapid Fire"))
+            {
+                return true;
+            }
+        }  
+        if (Api.Spellbook.CanCast("Fervor") && Api.Spellbook.HasSpell("Fervor") && !Api.Spellbook.OnCooldown("Fervor") && IsValid(pet) && focus < 50)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Fervor");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Fervor"))
+            {
+                return true;
+            }
+        }                              
+
+            // Insert other melee spells or abilities here
+        if (IsValid(pet) && PetHealth < 40 && Api.Spellbook.CanCast("Mend Pet") && !pet.Auras.Contains("Mend Pet"))
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Pet health is low healing him");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Mend Pet"))
+
+                return true;
+        }
+
 
         if (targetDistance > 10)
         {
@@ -368,17 +287,50 @@ public class BMhunterWOTLK : Rotation
                     // Insert other ranged spells or abilities here
                 }
             }
-            if (Api.Spellbook.CanCast("Arcane Shot") && !Api.Spellbook.OnCooldown("Arcane Shot"))
+            if (Api.Spellbook.CanCast("Kill Shot") && !Api.Spellbook.OnCooldown("Kill Shot") && targethealth <= 20)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Kill Shot");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Kill Shot"))
+                {
+                    return true;
+                }
+            }
+
+            if (Api.Spellbook.CanCast("Serpent Sting") && !target.Auras.Contains("Serpent Sting") && healthPercentage > 30 && focus > 20)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Serpent Sting");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Serpent Sting"))
+                    return true;
+            }
+
+            if (Api.Spellbook.CanCast("Arcane Shot")  && focus > 25)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Arcane Shot");
                 Console.ResetColor();
 
                 if (Api.Spellbook.Cast("Arcane Shot"))
+                    return true;
+            }
+
+            if (Api.Spellbook.CanCast("Cobra Shot") && target.Auras.Contains("Serpent Sting"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Cobra Shot");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Cobra Shot"))
                 {
                     return true;
                 }
-            }
+            }  
+
             if (Api.Spellbook.CanCast("Steady Shot"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -389,17 +341,7 @@ public class BMhunterWOTLK : Rotation
                 {
                     return true;
                 }
-            }
-
-            if (Api.Spellbook.CanCast("Serpent Sting") && !target.Auras.Contains("Serpent Sting") && healthPercentage > 30 && mana > 20)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Serpent Sting");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Serpent Sting"))
-                    return true;
-            }
+            }            
 
             if (Api.Spellbook.CanCast("Auto Shot"))
             {

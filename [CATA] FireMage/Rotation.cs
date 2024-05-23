@@ -8,7 +8,7 @@ using wShadow.Warcraft.Managers;
 
 
 
-public class FireMageWotlk : Rotation
+public class FireMage : Rotation
 {
 
     private List<string> npcConditions = new List<string>
@@ -86,7 +86,7 @@ public class FireMageWotlk : Rotation
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
 
-        if (Api.Spellbook.CanCast("Conjure Refreshment") && !HasItem("Conjured Mana Cake"))
+        if (Api.Spellbook.CanCast("Conjure Refreshment") && !HasConjuredItem())
         {
             if (Api.Spellbook.Cast("Conjure Refreshment"))
             {
@@ -139,7 +139,7 @@ public class FireMageWotlk : Rotation
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
             mana > 20 && !IsNPC(target))
         {
-            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") && !Api.Spellbook.OnCooldown("Pyroblast"))
+            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") )
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Pyroblast");
@@ -214,7 +214,7 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Evocation"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") )
+        if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") && ( target.Auras.Contains("Living Bomb") || target.Auras.Contains("Pyroblast") || target.Auras.Contains("Ignite")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Combustion");
@@ -251,6 +251,7 @@ public class FireMageWotlk : Rotation
             if (Api.Spellbook.Cast("Living Bomb"))
                 return true;
         }
+
         if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") && !Api.Spellbook.OnCooldown("Pyroblast"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -323,6 +324,29 @@ public class FireMageWotlk : Rotation
 
 
         return base.CombatPulse();
+    }
+    private bool HasConjuredItem()
+    {
+        var conjuredItems = new List<string>
+    {
+        "Conjured Mana Cookie",
+        "Conjured Mana Brownie",
+        "Conjured Mana Cupcake",
+        "Conjured Mana Lollipop",
+        "Conjured Mana Pie",
+        "Conjured Mana Strudel",
+        "Conjured Mana Cake"
+    };
+
+        foreach (var item in conjuredItems)
+        {
+            if (HasItem(item))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     private bool IsNPC(WowUnit unit)
     {

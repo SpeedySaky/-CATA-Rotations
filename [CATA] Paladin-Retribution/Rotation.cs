@@ -77,17 +77,7 @@ public class RetPalaWOTLK : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Holy Light") && Api.Player.HealthPercent <= 60)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Holy Light");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Holy Light"))
-            {
-                return true;
-            }
-        }
+        
 
 
         if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
@@ -161,12 +151,23 @@ public class RetPalaWOTLK : Rotation
         var targetHealth = Api.Target.HealthPercent;
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Flash of Light") && (Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && healthPercentage < 75)
+        if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flash of Light");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Flash of Light"))
+            {
+                return true;
+            }
+        }
+        if (Api.Spellbook.CanCast("Holy Wrath") && targetHealth <= 20)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Holy Wrath");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Holy Wrath"))
             {
                 return true;
             }
@@ -292,17 +293,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Holy Wrath") && targetHealth <= 20)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Holy Wrath");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Holy Wrath"))
-            {
-                return true;
-            }
-        }
+        
 
         if (Api.Spellbook.CanCast("Hammer of Wrath") && targetHealth <= 20)
         {
