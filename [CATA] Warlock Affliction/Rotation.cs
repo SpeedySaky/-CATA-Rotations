@@ -361,15 +361,7 @@ public class AfflictionLock : Rotation
             if (Api.Spellbook.Cast("Health Funnel"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Immolate");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Immolate"))
-                return true;
-        }
+        
 
         if (Api.Spellbook.CanCast("Drain Life") && healthPercentage <= 50 && mana >= 10)
         {
@@ -429,15 +421,7 @@ public class AfflictionLock : Rotation
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Incinerate") && target.Auras.Contains("Immolate"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Incinerate");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Incinerate"))
-                return true;
-        }
+        
 
 
         if (Api.Spellbook.CanCast("Shadow Bolt"))
