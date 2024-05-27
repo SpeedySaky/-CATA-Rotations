@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
-
+using wShadow.Warcraft.Usefuls;
 
 public class BoomkinCATA : Rotation
 {
@@ -172,7 +172,7 @@ public class BoomkinCATA : Rotation
         var target = Api.Target;
         var targetHealth = Api.Target.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
-        var lunar = me.LunarPower - 50;
+        var balancePower = me.GetUnitPower("BALANCE");
 
         if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -245,9 +245,6 @@ public class BoomkinCATA : Rotation
                 return true;
         }
 
-
-
-
         // DPS rotation
         if (Api.Spellbook.CanCast("Force of Nature") && Api.HasMacro("Treant") && targetDistance <= 15 && !Api.Spellbook.OnCooldown("Force of Nature") && Api.UnfriendlyUnitsNearby(10, true) >= 2)
         {
@@ -258,7 +255,7 @@ public class BoomkinCATA : Rotation
             if (Api.UseMacro("Treant"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20 && Api.UnfriendlyUnitsNearby(10, true) >= 2 && !Api.Spellbook.OnCooldown("Starfall") && me.Auras.Contains(48518))
+        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20 && Api.UnfriendlyUnitsNearby(10, true) >= 2 && !Api.Spellbook.OnCooldown("Starfall") && balancePower == 100)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Starfall");
@@ -267,7 +264,6 @@ public class BoomkinCATA : Rotation
             if (Api.Spellbook.Cast("Starfall"))
                 return true;
         }
-
 
         if (!target.Auras.Contains("Insect Swarm") && Api.Spellbook.CanCast("Insect Swarm"))
         {
@@ -279,8 +275,7 @@ public class BoomkinCATA : Rotation
                 return true;
         }
 
-       
-        if (Api.Spellbook.CanCast("Starsurge") && me.Auras.Contains(93400) ) 
+        if (Api.Spellbook.CanCast("Starsurge") && me.Auras.Contains(93400))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Starsurge instant");
@@ -289,18 +284,17 @@ public class BoomkinCATA : Rotation
             if (Api.Spellbook.Cast("Starsurge"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Sunfire") && me.Auras.Contains(48517) && !target.Auras.Contains("Sunfire"))
+        if (Api.Spellbook.CanCast("Moonfire") && (!target.Auras.Contains("Moonfire") && !target.Auras.Contains("Sunfire")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Sunfire");
+            Console.WriteLine("Casting Moonfire for filler");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Sunfire"))
+            if (Api.Spellbook.Cast("Moonfire"))
                 return true;
         }
 
-
-        if (me.Auras.Contains(48518))
+        if (balancePower == -100)
         {
             if (Api.Spellbook.CanCast("Starfire"))
             {
@@ -322,10 +316,17 @@ public class BoomkinCATA : Rotation
                     return true;
             }
         }
-        if (me.Auras.Contains(48517))
+        if (balancePower == 100)
         {
+            if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Sunfire"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Sunfire for Solar eclipse");
+                Console.ResetColor();
 
-
+                if (Api.Spellbook.Cast("Moonfire"))
+                    return true;
+            }
             if (Api.Spellbook.CanCast("Wrath"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -336,12 +337,48 @@ public class BoomkinCATA : Rotation
                     return true;
             }
         }
-        if (!me.Auras.Contains(48518) || !me.Auras.Contains(48517))
+        if (balancePower > -100 && balancePower <=0)
         {
             if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Moonfire"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Moonfire");
+                Console.WriteLine("Casting Moonfire for balancePower > -100 && balancePower <0");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Moonfire"))
+                    return true;
+            }
+            
+            if (Api.Spellbook.CanCast("Starsurge") && !Api.Spellbook.OnCooldown("Starsurge"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Starsurge");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Starsurge"))
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Wrath"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Wrath");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Wrath"))
+                    return true;
+            }
+        }
+
+
+        if (balancePower >1 && balancePower < 100)
+        {
+            if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Moonfire") && !target.Auras.Contains("Sunfire"))
+            
+                // Your code here
+            
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Moonfire balancePower >1 && balancePower < 100");
                 Console.ResetColor();
 
                 if (Api.Spellbook.Cast("Moonfire"))
@@ -368,10 +405,9 @@ public class BoomkinCATA : Rotation
             }
         }
 
-
-
         return base.CombatPulse();
     }
+
     private bool IsNPC(WowUnit unit)
     {
         if (!IsValid(unit))
@@ -403,52 +439,27 @@ public class BoomkinCATA : Rotation
     {
         var me = Api.Player;
         var target = Api.Target;
+        // Assuming u is a WowUnit or WowPlayer object
+        var balancePower = me.GetUnitPower("BALANCE");
 
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
-        var lunar = me.MaxLunarPower;
-        var lunarme = me.LunarPower;
+
+
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana}% Mana available");
-        Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
-        Console.WriteLine($"{lunar} Lunar Power available");   // Added line to log lunar power
-        Console.WriteLine($"{lunarme} Lunar Power available");   // Added line to log lunar power
+        Console.WriteLine($"Balance Power (cata) is {balancePower}");
 
-
-
+        foreach (var aura in target.Auras.ActiveAuras)
+        {
+            Console.WriteLine($"Active Aura Name: {aura.Name}");
+        }
         Console.ResetColor();
 
     }
-    public void LogEnergyValues()
-    {
-        var me = Api.Player;
 
-        var energyValues = new Dictionary<string, float>
-    {
-        { "MaxEnergy", me.MaxEnergy },
-        { "Energy", me.Energy },
-        { "MaxFocus", me.MaxFocus },
-        { "Focus", me.Focus },
-        { "MaxRage", me.MaxRage },
-        { "Rage", me.Rage },
-        { "MaxFury", me.MaxFury },
-        { "Fury", me.Fury },
-        { "MaxMana", me.MaxMana },
-        { "Mana", me.Mana },
-        { "MaxChi", me.MaxChi },
-        { "Chi", me.Chi },
-        { "MaxLunarPower", me.MaxLunarPower },
-        { "LunarPower", me.LunarPower },
-        { "SecondaryPowerMax", me.SecondaryPowerMax },
-        { "PrimaryPowerMax", me.PrimaryPowerMax },
-        // Add any other energy-related properties here
-    };
-
-        foreach (var entry in energyValues)
-        {
-            Console.WriteLine($"{entry.Key}: {entry.Value}");
-        }
-    }
+   
+  
 
 
 }
