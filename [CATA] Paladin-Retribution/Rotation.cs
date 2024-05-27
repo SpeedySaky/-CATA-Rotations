@@ -19,6 +19,14 @@ public class RetPalaWOTLK : Rotation
         }
         return true;
     }
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    };
 
     private CreatureType GetCreatureType(WowUnit unit)
     {
@@ -67,8 +75,11 @@ public class RetPalaWOTLK : Rotation
         var me = Api.Player;
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
+        var target = Api.Target;
+        var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
+        if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -80,7 +91,7 @@ public class RetPalaWOTLK : Rotation
         
 
 
-        if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
+        if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !me.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Retribution Aura");
@@ -91,7 +102,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.Auras.Contains("Devotion Aura", false) && !Api.Player.Auras.Contains("Retribution Aura", false) && !Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Devotion Aura") && !Api.Player.Auras.Contains("Devotion Aura", false) && !Api.Player.Auras.Contains("Retribution Aura", false) && !me.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Devotion Aura");
@@ -102,7 +113,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura", false) && Api.Player.IsMounted())
+        else if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura", false) && me.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Crusader Aura");
@@ -136,7 +147,20 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        var reaction = me.GetReaction(target);
 
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+        {
+            if (Api.Spellbook.CanCast("Judgement") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Judgement"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Judgement");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Judgement"))
+                    return true;
+            }
+        }
         return base.PassivePulse();
     }
 
@@ -149,7 +173,7 @@ public class RetPalaWOTLK : Rotation
 
         var target = Api.Target;
         var targetHealth = Api.Target.HealthPercent;
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60)
         {
@@ -340,6 +364,33 @@ public class RetPalaWOTLK : Rotation
         return base.CombatPulse();
     }
 
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
+
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
+    }
     private void LogPlayerStats()
     {
         var me = Api.Player;
