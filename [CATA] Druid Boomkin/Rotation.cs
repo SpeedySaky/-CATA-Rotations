@@ -7,10 +7,18 @@ using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
 
 
-public class BoomkinWOTLK : Rotation
+public class BoomkinCATA : Rotation
 {
     private int debugInterval = 5;
     private DateTime lastDebugTime = DateTime.MinValue;
+    private List<string> npcConditions = new List<string>
+    {
+        "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
+        "PlayerVehicle", "StableMaster", "Repair", "Trainer", "TrainerClass",
+        "TrainerProfession", "Vendor", "VendorAmmo", "VendorFood", "VendorPoison",
+        "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
+        "QuestGiver"
+    };
     public bool IsValid(WowUnit unit)
     {
         if (unit == null || unit.Address == null)
@@ -52,6 +60,9 @@ public class BoomkinWOTLK : Rotation
         var me = Api.Player;
         var healthPercentage = me.HealthPercent;
         var mana = me.ManaPercent;
+        var target = Api.Target;
+        var targetHealth = Api.Target.HealthPercent;
+        var targetDistance = target.Position.Distance2D(me.Position);
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -99,17 +110,7 @@ public class BoomkinWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Thorns") && !Api.Player.Auras.Contains("Thorns") && !Api.Player.IsMounted())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Thorns");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Thorns"))
-            {
-                return true;
-            }
-        }
         if (Api.Spellbook.CanCast("Rejuvenation") && !Api.Player.Auras.Contains("Rejuvenation") && healthPercentage < 50 && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -143,7 +144,20 @@ public class BoomkinWOTLK : Rotation
                 return true;
             }
         }
+        var reaction = me.GetReaction(target);
+        if (target.IsValid())
+        {
+            if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Moofire") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Moofire");
+                Console.ResetColor();
 
+                if (Api.Spellbook.Cast("Moofire"))
+                    return true;
+
+            }
+        }
 
 
 
@@ -158,8 +172,40 @@ public class BoomkinWOTLK : Rotation
         var target = Api.Target;
         var targetHealth = Api.Target.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
-        if (target == null || target.IsDead() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
-        // Healing
+        var lunar = me.LunarPower - 50;
+
+        if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
+        if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
+        {
+            LogPlayerStats();
+            lastDebugTime = DateTime.Now; // Update lastDebugTime
+        }
+        if (Api.Spellbook.CanCast("Solar Beam") && (target.IsCasting() || target.IsChanneling()))
+        {
+            if (Api.Spellbook.CanCast("Solar Beam"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Solar Beam");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Solar Beam"))
+                {
+                    return true;
+                }
+            }
+        }
+        if (Api.Spellbook.CanCast("Moonkin Form") && !Api.Player.Auras.Contains("Moonkin Form", false) && !Api.Player.IsMounted())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Moonkin Form");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Moonkin Form"))
+            {
+                return true;
+            }
+        }
         if (Api.Spellbook.CanCast("Rejuvenation") && healthPercentage <= 70 && !me.Auras.Contains("Rejuvenation"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -189,7 +235,7 @@ public class BoomkinWOTLK : Rotation
         }
 
         // Mana regeneration
-        if (!me.Auras.Contains("Innervate") && mana <= 30 && Api.Spellbook.CanCast("Innervate"))
+        if (!me.Auras.Contains("Innervate") && mana <= 30 && Api.Spellbook.CanCast("Innervate") && !Api.Spellbook.OnCooldown("Innervate"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Innervate");
@@ -199,30 +245,11 @@ public class BoomkinWOTLK : Rotation
                 return true;
         }
 
-        // Form management
-        if (!me.Auras.Contains("Moonkin Form",false) && Api.Spellbook.CanCast("Moonkin Form"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Moonkin Form");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Moonkin Form"))
-                return true;
-        }
 
-        // Debuffs
-        if (!target.Auras.Contains("Faerie Fire") && me.Auras.Contains("Moonkin Form") && Api.Spellbook.CanCast("Faerie Fire"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Faerie Fire");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Faerie Fire"))
-                return true;
-        }
 
         // DPS rotation
-        if (Api.Spellbook.CanCast("Force of Nature") && Api.HasMacro("Treant") && targetDistance <= 30 && !Api.Spellbook.OnCooldown("Force of Nature"))
+        if (Api.Spellbook.CanCast("Force of Nature") && Api.HasMacro("Treant") && targetDistance <= 15 && !Api.Spellbook.OnCooldown("Force of Nature") && Api.UnfriendlyUnitsNearby(10, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Force of Nature");
@@ -231,7 +258,7 @@ public class BoomkinWOTLK : Rotation
             if (Api.UseMacro("Treant"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20)
+        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20 && Api.UnfriendlyUnitsNearby(10, true) >= 2 && !Api.Spellbook.OnCooldown("Starfall") && me.Auras.Contains(48518))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Starfall");
@@ -240,7 +267,9 @@ public class BoomkinWOTLK : Rotation
             if (Api.Spellbook.Cast("Starfall"))
                 return true;
         }
-        if (!target.Auras.Contains("Insect Swarm") && !me.Auras.Contains(48517) && !me.Auras.Contains(48518) && Api.Spellbook.CanCast("Insect Swarm"))
+
+
+        if (!target.Auras.Contains("Insect Swarm") && Api.Spellbook.CanCast("Insect Swarm"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Insect Swarm");
@@ -249,78 +278,177 @@ public class BoomkinWOTLK : Rotation
             if (Api.Spellbook.Cast("Insect Swarm"))
                 return true;
         }
-        if (!target.Auras.Contains("Moonfire") && Api.Spellbook.CanCast("Moonfire"))
+
+       
+        if (Api.Spellbook.CanCast("Starsurge") && me.Auras.Contains(93400) ) 
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Moonfire");
+            Console.WriteLine("Casting Starsurge instant");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Moonfire"))
+            if (Api.Spellbook.Cast("Starsurge"))
                 return true;
         }
-        if (me.Auras.Contains(48517) && me.Auras.TimeRemaining(48517) > 1 && Api.Spellbook.CanCast("Wrath"))
+        if (Api.Spellbook.CanCast("Sunfire") && me.Auras.Contains(48517) && !target.Auras.Contains("Sunfire"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Wrath");
+            Console.WriteLine("Casting Sunfire");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Wrath"))
+            if (Api.Spellbook.Cast("Sunfire"))
                 return true;
         }
-        if (me.Auras.Contains(48518) && me.Auras.TimeRemaining(48518) > 1 && Api.Spellbook.CanCast("Starfire"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Starfire");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Starfire"))
-                return true;
-        }
-        if (Api.Spellbook.CanCast("Wrath") && Api.Spellbook.CanCast("Starfire"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Wrath");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Wrath") && mana > 11)
-                return true;
-            else
+        if (me.Auras.Contains(48518))
+        {
+            if (Api.Spellbook.CanCast("Starfire"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Starfire");
                 Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Starfire") && mana > 16)
+                if (Api.Spellbook.Cast("Starfire"))
+                    return true;
+            }
+
+            if (Api.Spellbook.CanCast("Wrath"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Wrath");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Wrath"))
                     return true;
             }
         }
-        if (!target.Auras.Contains("Moonfire") && Api.Spellbook.CanCast("Moonfire"))
+        if (me.Auras.Contains(48517))
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Moonfire");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Moonfire"))
-                return true;
+
+            if (Api.Spellbook.CanCast("Wrath"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Wrath");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Wrath"))
+                    return true;
+            }
         }
+        if (!me.Auras.Contains(48518) || !me.Auras.Contains(48517))
+        {
+            if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Moonfire"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Moonfire");
+                Console.ResetColor();
 
-        
+                if (Api.Spellbook.Cast("Moonfire"))
+                    return true;
+            }
+
+            if (Api.Spellbook.CanCast("Starsurge") && !Api.Spellbook.OnCooldown("Starsurge"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Starsurge");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Starsurge"))
+                    return true;
+            }
+            if (Api.Spellbook.CanCast("Wrath"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Wrath");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Wrath"))
+                    return true;
+            }
+        }
 
 
 
         return base.CombatPulse();
     }
+    private bool IsNPC(WowUnit unit)
+    {
+        if (!IsValid(unit))
+        {
+            // If the unit is not valid, consider it not an NPC
+            return false;
+        }
 
+        foreach (var condition in npcConditions)
+        {
+            switch (condition)
+            {
+                case "Innkeeper" when unit.IsInnkeeper():
+                case "Auctioneer" when unit.IsAuctioneer():
+                case "Banker" when unit.IsBanker():
+                case "FlightMaster" when unit.IsFlightMaster():
+                case "GuildBanker" when unit.IsGuildBanker():
+                case "StableMaster" when unit.IsStableMaster():
+                case "Trainer" when unit.IsTrainer():
+                case "Vendor" when unit.IsVendor():
+                case "QuestGiver" when unit.IsQuestGiver():
+                    return true;
+            }
+        }
+
+        return false;
+    }
     private void LogPlayerStats()
     {
         var me = Api.Player;
+        var target = Api.Target;
 
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
-
-
+        var lunar = me.MaxLunarPower;
+        var lunarme = me.LunarPower;
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana}% Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
+        Console.WriteLine($"{lunar} Lunar Power available");   // Added line to log lunar power
+        Console.WriteLine($"{lunarme} Lunar Power available");   // Added line to log lunar power
+
+
+
+        Console.ResetColor();
+
     }
+    public void LogEnergyValues()
+    {
+        var me = Api.Player;
+
+        var energyValues = new Dictionary<string, float>
+    {
+        { "MaxEnergy", me.MaxEnergy },
+        { "Energy", me.Energy },
+        { "MaxFocus", me.MaxFocus },
+        { "Focus", me.Focus },
+        { "MaxRage", me.MaxRage },
+        { "Rage", me.Rage },
+        { "MaxFury", me.MaxFury },
+        { "Fury", me.Fury },
+        { "MaxMana", me.MaxMana },
+        { "Mana", me.Mana },
+        { "MaxChi", me.MaxChi },
+        { "Chi", me.Chi },
+        { "MaxLunarPower", me.MaxLunarPower },
+        { "LunarPower", me.LunarPower },
+        { "SecondaryPowerMax", me.SecondaryPowerMax },
+        { "PrimaryPowerMax", me.PrimaryPowerMax },
+        // Add any other energy-related properties here
+    };
+
+        foreach (var entry in energyValues)
+        {
+            Console.WriteLine($"{entry.Key}: {entry.Value}");
+        }
+    }
+
+
 }
