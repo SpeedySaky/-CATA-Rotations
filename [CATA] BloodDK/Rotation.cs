@@ -49,7 +49,7 @@ public class BloodDK : Rotation
         var PetHealth = 0.0f;
 
         var targetDistance = target.Position.Distance2D(me.Position);
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         if (IsValid(pet))
         {
             PetHealth = pet.HealthPercent;
@@ -109,6 +109,7 @@ public class BloodDK : Rotation
                     return true;
             }
         }
+
         return base.PassivePulse();
     }
 
@@ -129,7 +130,7 @@ public class BloodDK : Rotation
         {
             LogPlayerStatsPeriodically();
         }
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !target.IsValid()) return false;
 
         // Determine if we're in an AoE scenario
         bool isAoE = Api.UnfriendlyUnitsNearby(10, true) >= 3;
@@ -304,6 +305,15 @@ public class BloodDK : Rotation
                 if (Api.Spellbook.Cast("Outbreak"))
                     return true;
             }
+            if (Api.HasMacro("Death and Decay") && Api.Spellbook.CanCast("Death and Decay") && unholyRunes >= 1 && !Api.Spellbook.OnCooldown("Death and Decay"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Death and Decay");
+                Console.ResetColor();
+
+                if (Api.UseMacro("Death and Decay"))
+                    return true;
+            }
             if (Api.Spellbook.CanCast("Icy Touch") && !target.Auras.Contains("Frost Fever") && (frostRunes >= 1 || deathRunes >= 1))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -360,7 +370,7 @@ public class BloodDK : Rotation
 
         }
 
-        
+
 
         return base.CombatPulse();
     }

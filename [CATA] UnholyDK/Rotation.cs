@@ -48,7 +48,7 @@ public class UnholyDK : Rotation
         var PetHealth = 0.0f;
 
         var targetDistance = target.Position.Distance2D(me.Position);
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() ||  me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
         if (IsValid(pet))
         {
             PetHealth = pet.HealthPercent;
@@ -87,17 +87,17 @@ public class UnholyDK : Rotation
             }
         }
         var reaction = me.GetReaction(target);
-
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted)  && !IsNPC(target))
+        if (target.IsValid())
         {
-            if (Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
+            if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Death Grip") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Death Grip");
-                Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Death Grip");
+                    Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Death Grip"))
-                    return true;
+                    if (Api.Spellbook.Cast("Death Grip"))
+                        return true;
+                
             }
         }
         return base.PassivePulse();
@@ -204,7 +204,24 @@ public class UnholyDK : Rotation
                 return true;
         }
 
+        if (Api.Spellbook.CanCast("Outbreak") && !target.Auras.Contains("Blood Plague") && !target.Auras.Contains("Frost Fever"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Outbreak");
+            Console.ResetColor();
 
+            if (Api.Spellbook.Cast("Outbreak"))
+                return true;
+        }
+        if (Api.HasMacro("Death and Decay") && Api.Spellbook.CanCast("Death and Decay") && unholyRunes >= 1 && !Api.Spellbook.OnCooldown("Death and Decay"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Death and Decay");
+            Console.ResetColor();
+
+            if (Api.UseMacro("Death and Decay"))
+                return true;
+        }
         if (Api.UnfriendlyUnitsNearby(10, true) >= 2 && Api.Spellbook.CanCast("Pestilence") && (bloodRunes >= 1 || deathRunes >= 1) && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -290,7 +307,7 @@ public class UnholyDK : Rotation
             if (Api.Spellbook.Cast("Empower Rune Weapon"))
                 return true;
         }
-        if ((Api.Spellbook.CanCast("Obliterate") && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague") && unholyRunes >= 1 && frostRunes >= 1 && runicPower >= 15) || (Api.Spellbook.CanCast("Obliterate") && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague") && deathRunes >= 1 && frostRunes >= 1 ) || (Api.Spellbook.CanCast("Obliterate") && target.Auras.Contains("Frost Fever") && target.Auras.Contains("Blood Plague") && deathRunes >= 1 && unholyRunes >= 1 ))
+        if ((Api.Spellbook.CanCast("Obliterate") && !target.Auras.Contains("Frost Fever") && !target.Auras.Contains("Blood Plague") && unholyRunes >= 1 && frostRunes >= 1 && runicPower >= 15) || (Api.Spellbook.CanCast("Obliterate") && !target.Auras.Contains("Frost Fever") && !target.Auras.Contains("Blood Plague") && deathRunes >= 1 && frostRunes >= 1 ) || (Api.Spellbook.CanCast("Obliterate") && !target.Auras.Contains("Frost Fever") && !target.Auras.Contains("Blood Plague") && deathRunes >= 1 && unholyRunes >= 1 ))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Obliterate ");
