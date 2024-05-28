@@ -111,7 +111,7 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Molten Armor"))
                 return true;
         }
-        
+
         if (Api.Spellbook.CanCast("Amplify Magic") && !me.Auras.Contains("Amplify Magic"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -135,11 +135,12 @@ public class FireMage : Rotation
 
 
 
-       
+        if (target.IsValid())
+        { 
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
             mana > 20 && !IsNPC(target))
         {
-            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") )
+            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Pyroblast");
@@ -162,7 +163,7 @@ public class FireMage : Rotation
                 }
             }
         }
-       
+    }
         return base.PassivePulse();
 
     }
@@ -262,7 +263,7 @@ public class FireMage : Rotation
                 return true;
         }
                
-        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast") && targetDistance<24)
+        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast") )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fire Blast");
@@ -280,7 +281,7 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Scorch"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Fireball") && mana >= 19 && targethealth > 20)
+        if (Api.Spellbook.CanCast("Fireball") && mana >= 19 )
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fireball");
