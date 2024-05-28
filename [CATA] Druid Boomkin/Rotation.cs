@@ -27,7 +27,15 @@ public class BoomkinCATA : Rotation
         }
         return true;
     }
+    public bool FlightForm()
+    {
+        var me = Api.Player;
 
+        if (me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Ghost Wolf", false))
+            return true;
+        else
+            return false;
+    }
     public override void Initialize()
     {
 
@@ -64,7 +72,7 @@ public class BoomkinCATA : Rotation
         var targetHealth = Api.Target.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsMounted() || FlightForm() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || me.IsMounted()) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -86,17 +94,7 @@ public class BoomkinCATA : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Moonkin Form") && !Api.Player.Auras.Contains("Moonkin Form", false) && !Api.Player.IsMounted())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Moonkin Form");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Moonkin Form"))
-            {
-                return true;
-            }
-        }
+       
 
 
         if (Api.Spellbook.CanCast("Mark of the Wild") && !Api.Player.Auras.Contains("Mark of the Wild") && !Api.Player.IsMounted())
@@ -147,6 +145,17 @@ public class BoomkinCATA : Rotation
         var reaction = me.GetReaction(target);
         if (target.IsValid())
         {
+            if (Api.Spellbook.CanCast("Moonkin Form") && !Api.Player.Auras.Contains("Moonkin Form", false) && !Api.Player.IsMounted())
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Moonkin Form");
+                Console.ResetColor();
+
+                if (Api.Spellbook.Cast("Moonkin Form"))
+                {
+                    return true;
+                }
+            }
             if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Moofire") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -255,7 +264,7 @@ public class BoomkinCATA : Rotation
             if (Api.UseMacro("Treant"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20 && Api.UnfriendlyUnitsNearby(10, true) >= 2 && !Api.Spellbook.OnCooldown("Starfall") && balancePower == 100)
+        if (Api.Spellbook.CanCast("Starfall") && targetDistance <= 20 && Api.UnfriendlyUnitsNearby(10, true) >= 2 && !Api.Spellbook.OnCooldown("Starfall"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Starfall");
@@ -337,7 +346,7 @@ public class BoomkinCATA : Rotation
                     return true;
             }
         }
-        if (balancePower > -100 && balancePower <=0)
+        if (balancePower > -100 && balancePower <= 0)
         {
             if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Moonfire"))
             {
@@ -348,7 +357,7 @@ public class BoomkinCATA : Rotation
                 if (Api.Spellbook.Cast("Moonfire"))
                     return true;
             }
-            
+
             if (Api.Spellbook.CanCast("Starsurge") && !Api.Spellbook.OnCooldown("Starsurge"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -370,12 +379,12 @@ public class BoomkinCATA : Rotation
         }
 
 
-        if (balancePower >1 && balancePower < 100)
+        if (balancePower > 1 && balancePower < 100)
         {
             if (Api.Spellbook.CanCast("Moonfire") && !target.Auras.Contains("Moonfire") && !target.Auras.Contains("Sunfire"))
-            
-                // Your code here
-            
+
+            // Your code here
+
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Moonfire balancePower >1 && balancePower < 100");
@@ -458,8 +467,8 @@ public class BoomkinCATA : Rotation
 
     }
 
-   
-  
+
+
 
 
 }

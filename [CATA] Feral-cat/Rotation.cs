@@ -12,7 +12,15 @@ public class CatDruid : Rotation
     private bool HasItem(object item)
         => Api.Inventory.HasItem(item);
 
+    public bool FlightForm()
+    {
+        var me = Api.Player;
 
+        if (me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Ghost Wolf", false))
+            return true;
+        else
+            return false;
+    }
     private List<string> npcConditions = new List<string>
     {
         "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
@@ -75,7 +83,7 @@ public class CatDruid : Rotation
         var meTarget = me.Target;
 
 
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Swift Flight Form", false) || me.Auras.Contains("Flight Form", false) || me.Auras.Contains("Travel Form", false) || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if (me.IsMounted() || FlightForm() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || me.IsMounted()) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
@@ -83,7 +91,7 @@ public class CatDruid : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-    
+
 
         if (Api.Spellbook.CanCast("Mark of the Wild") && !me.Auras.Contains("Mark of the Wild"))
         {
@@ -113,32 +121,32 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Healing Touch"))
                 return true;
         }
-        if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768, false))
-        {
-            Print($"Casting Cat Form", ConsoleColor.Green);
-            if (Api.Spellbook.Cast(768))
-                return true;
-        }
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
-        {
-            if (Api.Spellbook.CanCast("Feral Charge") && targetDistance > 5 && targetDistance < 25 && !Api.Spellbook.OnCooldown("Feral Charge") && !Api.Spellbook.OnCooldown("Feral Charge"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Feral Charge");
-                Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Feral Charge"))
-                    return true;
-            }
-        }
-        else if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
-
+        if (target.IsValid())
         {
-            if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
+            if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768, false))
             {
-                Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
-                return true;
+                Print($"Casting Cat Form", ConsoleColor.Green);
+                {
+                    if (Api.Spellbook.Cast(768))
+                        return true;
+                }
             }
+
+            if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target) && Api.Spellbook.CanCast("Moofire") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Death Grip"))
+            {
+                if (Api.Spellbook.CanCast("Feral Charge") && targetDistance > 5 && targetDistance < 25 && !Api.Spellbook.OnCooldown("Feral Charge") && !Api.Spellbook.OnCooldown("Feral Charge"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Feral Charge");
+                    Console.ResetColor();
+                    { }
+                    if (Api.Spellbook.Cast("Feral Charge"))
+                        return true;
+                }
+
+            }
+
         }
 
 
@@ -204,13 +212,13 @@ public class CatDruid : Rotation
 
         if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
 
+        {
+            if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
             {
-                if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
-                {
-                    Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
-                    return true;
-                }
+                Console.WriteLine("Casting Faerie Fire (Feral)");  // Corrected the function name
+                return true;
             }
+        }
 
 
 
