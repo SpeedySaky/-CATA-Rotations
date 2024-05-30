@@ -165,7 +165,7 @@ public class CatDruid : Rotation
 
         var target = Api.Target;
         var targethealth = target.HealthPercent;
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food") || !target.IsValid() || target.IsDeadOrGhost()) return false;
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")  || target.IsDeadOrGhost()) return false;
 
 
         if (!me.Auras.Contains("Innervate") && Api.Spellbook.CanCast("Innervate") && manaPercentage <= 30)
@@ -206,11 +206,13 @@ public class CatDruid : Rotation
         if (Api.Spellbook.CanCast(768) && !me.Auras.Contains(768, false))
         {
             Print($"Casting Cat Form", ConsoleColor.Green);
-            if (Api.Spellbook.Cast(768))
-                return true;
+            {
+                if (Api.Spellbook.Cast(768))
+                    return true;
+            }
         }
 
-        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && (!target.Auras.Contains("Faerie Fire") || (target.Auras.TimeRemaining("Faerie Fire") <= 1000)))
+        if (Api.Spellbook.CanCast("Faerie Fire (Feral)") && !target.Auras.Contains("Faerie Fire"))
 
         {
             if (Api.Spellbook.Cast("Faerie Fire (Feral)"))
@@ -223,68 +225,68 @@ public class CatDruid : Rotation
 
 
 
-        if (Api.Spellbook.CanCast("Maim") && (target.IsCasting() || target.IsChanneling()) && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Maim") && (target.IsCasting() || target.IsChanneling()))
         {
             Print($"Casting Maim", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Maim"))
                 return true;
         }
 
-        if (Api.UnitsNearby(15, false) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.Auras.Contains("Berserk") && me.Auras.Contains(768, false))
+        if (Api.UnitsNearby(15, false) >= 2 && Api.Spellbook.CanCast("Berserk") && !me.Auras.Contains("Berserk") )
         {
             Print($"Casting Berserk", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Berserk"))
                 return true;
         }
-        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle") && me.Auras.Contains(768, false))
+        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle"))
         {
             Print($"Casting Mangle", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Savage Roar") && !me.Auras.Contains("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Savage Roar") && !me.Auras.Contains("Savage Roar") && comboPoints >= 2 && target.HealthPercent >= 40 && energy >= 25 )
         {
             Print($"Casting Savage Roar with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Savage Roar"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50 && me.Auras.Contains(768, false) && energy <= 40)
+        if (Api.Spellbook.CanCast("Tiger's Fury") && !me.Auras.Contains("Tiger's Fury") && !me.Auras.Contains("Berserk") && target.HealthPercent >= 50  && energy <= 40)
         {
             Print($"Casting Tiger's Fury", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Tiger's Fury"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rake") && !target.Auras.Contains("Rake") && target.HealthPercent >= 30 && energy > 40 && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Rake") && !target.Auras.Contains("Rake") && target.HealthPercent >= 30 && energy > 40 )
         {
             Print($"Casting Rake with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rake"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Rip") && !target.Auras.Contains("Rip") && target.HealthPercent >= 20 && energy > 30 && comboPoints >= 2 )
         {
             Print($"Casting Rip with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Rip"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5 && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Ferocious Bite") && energy > 35 && comboPoints >= 5  )
         {
             Print($"Casting Ferocious Bite with {comboPoints} Points and {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Ferocious Bite"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Mangle") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle") && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Mangle") && comboPoints < 5 && energy >= 45 && !target.Auras.Contains("Mangle") )
         {
             Print($"Casting Mangle  with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Mangle"))
                 return true;
         }
 
-        if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.Auras.Contains(768, false))
+        if (Api.Spellbook.CanCast("Claw") && energy >= 45 )
         {
             Print($"Casting Claw with {energy} Energy", ConsoleColor.Green);
             if (Api.Spellbook.Cast("Claw"))
