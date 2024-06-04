@@ -95,7 +95,7 @@ public class ProtWarr : Rotation
         }
         var reaction = me.GetReaction(target);
 
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+        if (target.IsValid() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
 
             if (Api.Spellbook.CanCast("Charge") && (me.Auras.Contains("Battle Stance",false) || me.Auras.Contains("Warbringer",false)) && targetDistance <= 25)
 
@@ -273,7 +273,7 @@ public class ProtWarr : Rotation
                 if (Api.Spellbook.Cast("Rend"))
                     return true;
             }
-            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 3))
+            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 2))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Sunder Armor");
@@ -347,6 +347,14 @@ public class ProtWarr : Rotation
         // Single target rotation
         else
         {
+            if (Api.Spellbook.CanCast("Victory Rush") && me.Auras.Contains("Victorious"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Victory Rush");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Victory Rush"))
+                    return true;
+            }
             // Use Shield Slam on cooldown
             if (Api.Spellbook.CanCast("Shield Slam") && !Api.Spellbook.OnCooldown("Shield Slam") && rage >= 20 && !Api.Spellbook.OnCooldown("Shield Slam"))
             {
@@ -359,7 +367,7 @@ public class ProtWarr : Rotation
 
             // Use Revenge on cooldown
             
-            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 3) && rage >= 15)
+            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 2) && rage >= 15)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Sunder Armor");
@@ -380,7 +388,14 @@ public class ProtWarr : Rotation
                 if (Api.Spellbook.Cast("Devastate"))
                     return true;
             }
-           
+            if (Api.Spellbook.CanCast("Heroic Throw") && !Api.Spellbook.OnCooldown("Heroic Throw"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Casting Heroic Throw");
+                Console.ResetColor();
+                if (Api.Spellbook.Cast("Heroic Throw"))
+                    return true;
+            }
             if (Api.Spellbook.CanCast("Heroic Strike") && rage >= 60)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
