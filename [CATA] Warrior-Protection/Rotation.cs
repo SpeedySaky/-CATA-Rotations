@@ -9,13 +9,8 @@ using wShadow.Warcraft.Managers;
 
 
 
-public class ProtWarr : Rotation
+public class DestroLock : Rotation
 {
-
-    private int debugInterval = 5; // Set the debug interval in seconds
-    private DateTime lastDebugTime = DateTime.MinValue;
-    private DateTime lastRevengeTime = DateTime.MinValue;
-    private TimeSpan RevengeCooldown = TimeSpan.FromSeconds(5.5);
     private List<string> npcConditions = new List<string>
     {
         "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
@@ -24,6 +19,8 @@ public class ProtWarr : Rotation
         "VendorReagent", "WildBattlePet", "GarrisonMissionNPC", "GarrisonTalentNPC",
         "QuestGiver"
     };
+    private int debugInterval = 5; // Set the debug interval in seconds
+    private DateTime lastDebugTime = DateTime.MinValue;
     public bool IsValid(WowUnit unit)
     {
         if (unit == null || unit.Address == null)
@@ -32,8 +29,30 @@ public class ProtWarr : Rotation
         }
         return true;
     }
+    private bool HasItem(object item) => Api.Inventory.HasItem(item);
     public override void Initialize()
     {
+        //targets 
+        npcConditions.Add("Innkeeper");
+        npcConditions.Add("Auctioneer");
+        npcConditions.Add("Banker");
+        npcConditions.Add("FlightMaster");
+        npcConditions.Add("GuildBanker");
+        npcConditions.Add("PlayerVehicle");
+        npcConditions.Add("StableMaster");
+        npcConditions.Add("Repair");
+        npcConditions.Add("Trainer");
+        npcConditions.Add("TrainerClass");
+        npcConditions.Add("TrainerProfession");
+        npcConditions.Add("Vendor");
+        npcConditions.Add("VendorAmmo");
+        npcConditions.Add("VendorFood");
+        npcConditions.Add("VendorPoison");
+        npcConditions.Add("VendorReagent");
+        npcConditions.Add("WildBattlePet");
+        npcConditions.Add("GarrisonMissionNPC");
+        npcConditions.Add("GarrisonTalentNPC");
+        npcConditions.Add("QuestGiver");
         // Can set min/max levels required for this rotation.
 
         lastDebugTime = DateTime.Now;
@@ -42,7 +61,7 @@ public class ProtWarr : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 1000;
+        SlowTick = 1200;
         FastTick = 400;
 
         // You can also use this method to add to various action lists.
@@ -62,11 +81,173 @@ public class ProtWarr : Rotation
     }
     public override bool PassivePulse()
     {
+        // Variables for player and target instances
         var me = Api.Player;
-        var healthPercentage = me.HealthPercent;
-        var rage = me.Rage;
         var target = Api.Target;
+        var mana = me.ManaPercent;
+        var healthPercentage = me.HealthPercent;
+        var targethealth = target.HealthPercent;
+        var pet = me.Pet();
+        var PetHealth = 0.0f;
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
+        var TargetHealth = 0.0f;
+        if (IsValid(target))
+        {
+            TargetHealth = target.HealthPercent;
+        }
+
+        if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
+        {
+            LogPlayerStats();
+            lastDebugTime = DateTime.Now; // Update lastDebugTime
+        }
+        // Health percentage of the player
+
+        // Power percentages for different resources
+
+        // Target distance from the player
+
+        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+
+
+
+        if (!HasItem("Healthstone") && Api.Spellbook.CanCast("Create Healthstone"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Create Healthstone");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Create Healthstone"))
+            {
+                return false;
+            }
+        }
+
+
+        if (Api.Spellbook.CanCast("Life Tap") && healthPercentage > 80 && mana < 30)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Life Tap");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Life Tap"))
+            {
+                return true;
+            }
+        }
+
+        if (Api.Spellbook.CanCast("Fel Armor") && !me.Auras.Contains("Fel Armor", false))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Fel Armor");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Fel Armor"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Demon Armor") && !me.Auras.Contains("Fel Armor", false) && !me.Auras.Contains("Demon Armor", false))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Demon Armor");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Demon Armor"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Demon Skin") && !me.Auras.Contains("Fel Armor", false) && !me.Auras.Contains("Demon Armor", false) && !me.Auras.Contains("Demon Skin", false))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Demon Skin");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Demon Skin"))
+            {
+                return true;
+            }
+        }
+
+
+        if (IsValid(pet) && PetHealth < 50 && healthPercentage > 50 && Api.Spellbook.CanCast("Health Funnel"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Healing Pet ");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Health Funnel"))
+                return true;
+        }
+
+        //if (!IsValid(pet) && Api.Spellbook.CanCast("Summon Voidwalker") )
+        // {
+        //  Console.ForegroundColor = ConsoleColor.Green;
+        //  Console.WriteLine("Casting Summon VoidWalker.");
+        //  Console.ResetColor();
+
+        // if (Api.Spellbook.Cast("Summon Voidwalker"))
+        //{
+        // return true;
+        // }
+        //  }
+        if (!IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Summon Pet.");
+            Console.ResetColor();
+
+            if (Api.UseMacro("Imp"))
+            {
+                return true;
+            }
+        }
+
+
+        if (Api.Spellbook.CanCast("Soul Link") && !me.Auras.Contains("Soul Link", false) && IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Soul Link");
+            Console.ResetColor();
+            if (Api.Spellbook.Cast("Soul Link"))
+            {
+                return true;
+            }
+        }
+        if (Api.HasMacro("Combat") && !target.IsDead() && !IsNPC(target))
+
+        //macro needed
+        //Macro name : Combat
+        //Macro code:
+        // /cast Curse of Agony
+        // /petattack	
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Starting Combat");
+            Console.ResetColor();
+
+            if (Api.UseMacro("Combat"))
+            {
+                return true;
+            }
+        }
+
+        return base.PassivePulse();
+
+
+
+    }
+
+    public override bool CombatPulse()
+    {
+        // Variables for player and target instances
+        var me = Api.Player;
+        var target = Api.Target;
+        var mana = me.ManaPercent;
+        var targethealth = target.HealthPercent;
+        var healthPercentage = me.HealthPercent;
         var targetDistance = target.Position.Distance2D(me.Position);
+
 
         if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
@@ -75,347 +256,258 @@ public class ProtWarr : Rotation
             LogPlayerStats();
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
-        if (Api.Spellbook.CanCast("Battle Stance") && !me.Auras.Contains("Battle Stance",false) && !me.Auras.Contains("Warbringer",false))
+        // Health percentage of the player
+
+
+        var pet = me.Pet();
+        var PetHealth = 0.0f;
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
+        var meTarget = me.Target;
+
+        if (meTarget == null || target.IsDead())
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Battle Stance");
+            Console.WriteLine("Assist Pet");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Battle Stance"))
 
-                return true;
-        }
-        else if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance",false) && me.Auras.Contains("Warbringer",false))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Defensive Stance");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Defensive Stance"))
-
-                return true;
-        }
-        var reaction = me.GetReaction(target);
-
-        if (target.IsValid() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
-
-            if (Api.Spellbook.CanCast("Charge") && (me.Auras.Contains("Battle Stance",false) || me.Auras.Contains("Warbringer",false)) && targetDistance <= 25)
-
-
+            // Use the Target property to set the player's target to the pet's target
+            if (Api.UseMacro("AssistPet"))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Charge");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Charge"))
-                {
-                    return true;
-                }
+                // Successfully assisted the pet, continue rotation
+                // Don't return true here, continue with the rest of the combat logic
+                // without triggering a premature exit
             }
-
-
-        return base.PassivePulse();
-    }
-
-
-
-    public override bool CombatPulse()
-    {
-        var me = Api.Player;
-        var healthPercentage = me.HealthPercent;
-        var rage = me.Rage;
-        var target = Api.Target;
-        var targethealth = target.HealthPercent;
-        var enemiesNearby = Api.UnfriendlyUnitsNearby(5, true);
-
-        // Check if player is dead, a ghost, casting, moving, channeling, mounted, or has certain auras
-        if (me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
-
-        if (Api.Spellbook.CanCast("Defensive Stance") && !me.Auras.Contains("Defensive Stance", false))
+        }
+        if (!IsValid(pet))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Defensive Stance");
+            Console.WriteLine("Casting Summon Pet.");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Defensive Stance"))
 
+            if (Api.UseMacro("Imp"))
+            {
                 return true;
-        }
-        if ((Api.Spellbook.CanCast("Pummel") || Api.Spellbook.CanCast("Concussion Blow")) && (target.IsCasting() || target.IsChanneling()) )
-        {
-            if (Api.Spellbook.CanCast("Pummel") && !Api.Spellbook.OnCooldown("Pummel"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Pummel");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Pummel"))
-                {
-                    return true;
-                }
             }
-            else if (Api.Spellbook.CanCast("Concussion Blow") && !Api.Spellbook.OnCooldown("Concussion Blow"))
+        }
+        if (Api.Spellbook.CanCast("Drain Soul") && Api.Inventory.ItemCount("Soul Shard") <= 1 && targethealth <= 20)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Drain Soul");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Drain Soul"))
+            {
+                return true;
+            }
+        }
+
+
+        {
+            if (Api.Inventory.HasItem("Healthstone") && healthPercentage <= 40 && !Api.Inventory.OnCooldown("Healthstone"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Concussion Blow");
+                Console.WriteLine($"Using Healthstone");
                 Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Concussion Blow"))
+                if (Api.Inventory.Use("Healthstone"))
                 {
                     return true;
                 }
             }
         }
-        // Use Demoralizing Shout if you need to maintain the debuff
-        if (Api.Spellbook.CanCast("Demoralizing Shout") && !target.Auras.Contains("Demoralizing Shout") && rage >= 10)
+        if (meTarget == null || target.IsDead())
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Demoralizing Shout");
+            Console.WriteLine("Assist Pet");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Demoralizing Shout"))
-                return true;
-        }
-        if (Api.Spellbook.CanCast("Battle Shout") && !me.Auras.Contains("Battle Shout"))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Battle Shout");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Battle Shout"))
-                return true;
-        }
 
-        // Use Commanding Shout for Rage as needed
-        if (Api.Spellbook.CanCast("Commanding Shout") && !me.Auras.Contains("Commanding Shout") && rage < 60)
+            // Use the Target property to set the player's target to the pet's target
+            if (Api.UseMacro("AssistPet"))
+            {
+                // Successfully assisted the pet, continue rotation
+                // Don't return true here, continue with the rest of the combat logic
+                // without triggering a premature exit
+            }
+        }
+        if (PetHealth < 50 && healthPercentage > 50 && Api.Spellbook.CanCast("Health Funnel"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Commanding Shout");
+            Console.WriteLine("Healing Pet ");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Commanding Shout"))
+
+            if (Api.Spellbook.Cast("Health Funnel"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Shield Block") && !Api.Spellbook.OnCooldown("Shield Block") && rage >= 10)
+        if (Api.Spellbook.CanCast("Immolate") && !target.Auras.Contains("Immolate"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shield Block");
+            Console.WriteLine("Casting Immolate");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Shield Block"))
+
+            if (Api.Spellbook.Cast("Immolate"))
                 return true;
         }
 
-        // Use Shield Wall on 2-minute cooldown to reduce damage taken during high damage raid mechanics
-        if (Api.Spellbook.CanCast("Shield Wall") && !Api.Spellbook.OnCooldown("Shield Wall") && rage >= 10)
+        if (Api.Spellbook.CanCast("Drain Life") && healthPercentage <= 50 && mana >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shield Wall");
+            Console.WriteLine("Casting Drain Life");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Shield Wall"))
+
+            if (Api.Spellbook.Cast("Drain Life"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Shadowburn") && targethealth <= 15)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Shadowburn");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Shadowburn"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Shadow Bolt") && (me.Auras.HasBuff("Backlash") || me.Auras.Contains("Backlash")))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Shadow Bolt with Backlash");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Shadow Bolt"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Bane of Doom") && !target.Auras.Contains("Bane of Doom") && targethealth >= 30 && mana >= 10)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Bane of Doom");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Bane of Doom"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Corruption") && !target.Auras.Contains("Corruption") && targethealth >= 30 && mana >= 10)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Corruption");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Corruption"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Chaos Bolt") && !Api.Spellbook.OnCooldown("Chaos Bolt"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Chaos Bolt");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Chaos Bolt"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Soul Fire") && (!me.Auras.Contains("Improved Soul Fire") || me.Auras.Contains("Empowered Imp")))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Soul Fire");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Soul Fire"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Conflagrate") && target.Auras.Contains("Immolate") && !Api.Spellbook.OnCooldown("Conflagrate"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Conflagrate");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Conflagrate"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Incinerate") && target.Auras.Contains("Immolate"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Incinerate");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Incinerate"))
                 return true;
         }
 
-        // Use Last Stand on 3-minute cooldown whenever your health drops dangerously low
-        if (healthPercentage <= 30 && Api.Spellbook.CanCast("Last Stand") && !Api.Spellbook.OnCooldown("Last Stand"))
+
+        if (Api.Spellbook.CanCast("Shadow Bolt") && targethealth >= 30 && mana >= 20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Last Stand");
+            Console.WriteLine("Casting Shadow Bolt");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Last Stand"))
+
+            if (Api.Spellbook.Cast("Shadow Bolt"))
                 return true;
         }
 
-        // Use Enraged Regeneration on 3-minute cooldown together with Last Stand
-        if (healthPercentage <= 30 && Api.Spellbook.CanCast("Enraged Regeneration") && !Api.Spellbook.OnCooldown("Enraged Regeneration") && me.Auras.Contains("Last Stand"))
+        if (Api.Spellbook.CanCast("Shoot"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Enraged Regeneration");
+            Console.WriteLine("Casting Shoot");
             Console.ResetColor();
-            if (Api.Spellbook.Cast("Enraged Regeneration"))
+
+            if (Api.Spellbook.Cast("Shoot"))
                 return true;
         }
 
-        // Use Rallying Cry on 3-minute cooldown to help the group survive raid mechanics
-        if (Api.Spellbook.CanCast("Rallying Cry") && !Api.Spellbook.OnCooldown("Rallying Cry") && rage >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Rallying Cry");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Rallying Cry"))
-                return true;
-        }
-
-        // Use Challenging Shout on 3-minute cooldown when enemies get loose, usually on trash
-        if (Api.Spellbook.CanCast("Challenging Shout") && !Api.Spellbook.OnCooldown("Challenging Shout") && rage >= 10)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Challenging Shout");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Challenging Shout"))
-                return true;
-        }
-
-        // Use Inner Rage on 30-second cooldown when you have high Rage that you can't spend otherwise
-        if (Api.Spellbook.CanCast("Inner Rage") && !Api.Spellbook.OnCooldown("Inner Rage") && rage >= 60)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Inner Rage");
-            Console.ResetColor();
-            if (Api.Spellbook.Cast("Inner Rage"))
-                return true;
-        }
-
-        
-        // AoE rotation
-        if (enemiesNearby >= 2)
-        {
-
-            // Apply Rend to 1 target
-            if (Api.Spellbook.CanCast("Rend") && !target.Auras.Contains("Rend"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Rend");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Rend"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 2))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Sunder Armor");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Sunder Armor"))
-                {
-                    return true;
-                }
-            }
-
-            // Use Thunder Clap on cooldown; spreads Rend via Blood and Thunder
-            if (Api.Spellbook.CanCast("Thunder Clap") && !Api.Spellbook.OnCooldown("Thunder Clap") && rage >= 20)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Thunder Clap");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Thunder Clap"))
-                    return true;
-            }
-
-            // Use Shockwave on cooldown
-            if (Api.Spellbook.CanCast("Shockwave") && !Api.Spellbook.OnCooldown("Shockwave") && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Shockwave");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Shockwave"))
-                    return true;
-            }
-
-            // Use Revenge on cooldown
-           
-
-            // Use Shield Slam on any open globals
-            if (Api.Spellbook.CanCast("Shield Slam") && !Api.Spellbook.OnCooldown("Shield Slam") && rage >= 20)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Shield Slam");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Shield Slam"))
-                    return true;
-            }
-
-            // Use Cleave for any additional Rage
-            if (Api.Spellbook.CanCast("Cleave") && rage >= 30)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Cleave");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Cleave"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Heroic Strike") && rage >= 60)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Heroic Strike");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Heroic Strike"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Revenge") && !Api.Spellbook.OnCooldown("Revenge") && rage >= 5)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Revenge");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Revenge"))
-                    return true;
-            }
-        }
-        // Single target rotation
-        else
-        {
-            if (Api.Spellbook.CanCast("Victory Rush") && me.Auras.Contains("Victorious"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Victory Rush");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Victory Rush"))
-                    return true;
-            }
-            // Use Shield Slam on cooldown
-            if (Api.Spellbook.CanCast("Shield Slam") && !Api.Spellbook.OnCooldown("Shield Slam") && rage >= 20 && !Api.Spellbook.OnCooldown("Shield Slam"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Shield Slam");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Shield Slam"))
-                    return true;
-            }
-
-            // Use Revenge on cooldown
-            
-            if (Api.Spellbook.CanCast("Sunder Armor") && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 2) && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Sunder Armor");
-                Console.ResetColor();
-
-                if (Api.Spellbook.Cast("Sunder Armor"))
-                {
-                    return true;
-                }
-            }
-
-            // Use Devastate as a filler during the gaps in your rotation
-            if (Api.Spellbook.CanCast("Devastate") && rage >= 15)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Devastate");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Devastate"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Heroic Throw") && !Api.Spellbook.OnCooldown("Heroic Throw"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Heroic Throw");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Heroic Throw"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Heroic Strike") && rage >= 60)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Heroic Strike");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Heroic Strike"))
-                    return true;
-            }
-            if (Api.Spellbook.CanCast("Revenge") && !Api.Spellbook.OnCooldown("Revenge") && rage >= 5)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Revenge");
-                Console.ResetColor();
-                if (Api.Spellbook.Cast("Revenge"))
-                    return true;
-            }
-        }
 
         return base.CombatPulse();
     }
+    private void LogPlayerStats()
+    {
+        // Variables for player and target instances
+        var me = Api.Player;
+        var target = Api.Target;
+        var mana = me.Mana;
+
+        // Health percentage of the player
+        var healthPercentage = me.HealthPercent;
+        // Target distance from the player
+        var targetDistance = target.Position.Distance2D(me.Position);
+
+        var pet = me.Pet();
+        var PetHealth = 0.0f;
+        if (IsValid(pet))
+        {
+            PetHealth = pet.HealthPercent;
+        }
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"{mana} Mana available");
+        Console.WriteLine($"{healthPercentage}% Health available");
+
+        Console.ResetColor();
+
+        // Get the current count of Soul Shards in the inventory
+        int soulShardCount = Api.Inventory.ItemCount("Soul Shard");
+
+        
+
+        if (!IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Pet is not summoned.");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
+        else
+    if (IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Pet is summoned.");
+            Console.ResetColor();
+            // Additional actions for when the pet is dead
+        }
+       // Additional actions for when the pet is dead
+       
+        Console.ResetColor();
+    }
+
+
+
     private bool IsNPC(WowUnit unit)
     {
         if (!IsValid(unit))
@@ -442,64 +534,5 @@ public class ProtWarr : Rotation
         }
 
         return false;
-    }
-    private void LogPlayerStats()
-    {
-        var me = Api.Player;
-
-        var rage = me.Rage;
-        var healthPercentage = me.HealthPercent;
-
-
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{rage}% Rage available");
-        Console.WriteLine($"{healthPercentage}% Health available");
-
-
-        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains  Defensive Stance");
-        }
-
-        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains  Defensive Stance");
-        }
-        if (me.Auras.Contains("Defensive Stance")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains  Defensive Stance");
-        }
-
-        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains Warbringer");
-        }
-
-        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains  Warbringer");
-        }
-        if (me.Auras.Contains("Warbringer")) // Replace "Thorns" with the actual aura name
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-
-            Console.WriteLine($"Auras.Contains  Warbringer");
-        }
     }
 }

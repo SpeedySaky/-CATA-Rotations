@@ -92,7 +92,7 @@ public class ZerkWarr : Rotation
         var reaction = me.GetReaction(target);
 
 
-        if (target.IsValid() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
 
             if (Api.Spellbook.CanCast("Charge") && (me.Auras.Contains("Battle Stance", false) || me.Auras.Contains("Warbringer", false)) && targetDistance <= 25)
 
