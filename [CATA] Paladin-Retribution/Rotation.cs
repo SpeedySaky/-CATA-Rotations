@@ -175,7 +175,7 @@ public class RetPalaWOTLK : Rotation
         var targetHealth = Api.Target.HealthPercent;
         if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60)
+        if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60 && mana >31)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flash of Light");
@@ -185,7 +185,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Holy Wrath") && targetHealth <= 20)
+        if (Api.Spellbook.CanCast("Holy Wrath") && targetHealth <= 20 && mana >20)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Holy Wrath");
@@ -217,7 +217,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.Player.Auras.Contains("Divine Protection") && healthPercentage <= 50 && Api.Spellbook.CanCast("Holy Light"))
+        if (Api.Player.Auras.Contains("Divine Protection") && healthPercentage <= 50 && Api.Spellbook.CanCast("Holy Light") && mana > 12)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Holy Light");
@@ -229,10 +229,10 @@ public class RetPalaWOTLK : Rotation
         }
         CreatureType targetCreatureType = GetCreatureType(target);
 
-        if ((Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") && targetHealth > 75)
+        if ((Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") )
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Exorcism");
+            Console.WriteLine("Casting Exorcism with Art of truth");
             Console.ResetColor();
             if (Api.Spellbook.Cast("Exorcism"))
             {
@@ -250,7 +250,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
        
-        if (Api.Spellbook.CanCast("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath"))
+        if (Api.Spellbook.CanCast("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath") && mana > 8)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Avenging Wrath");
@@ -262,7 +262,7 @@ public class RetPalaWOTLK : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Truth"))
+        if (Api.Spellbook.CanCast("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Truth") && mana> 14)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Seal of Truth");
@@ -274,7 +274,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Consecration") && !!Api.Spellbook.OnCooldown("Consecration"))
+        if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Consecration") && !!Api.Spellbook.OnCooldown("Consecration") && mana > 55)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Consecration");
@@ -285,7 +285,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Divine Storm") && !!Api.Spellbook.OnCooldown("Divine Storm"))
+        if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Divine Storm") && !!Api.Spellbook.OnCooldown("Divine Storm") && mana > 5)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Divine Storm");
@@ -319,7 +319,7 @@ public class RetPalaWOTLK : Rotation
         }
         
 
-        if (Api.Spellbook.CanCast("Hammer of Wrath") && targetHealth <= 20)
+        if (Api.Spellbook.CanCast("Hammer of Wrath") && targetHealth <= 20 && mana > 12)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Hammer of Wrath");
@@ -329,7 +329,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        else if (Api.Spellbook.CanCast("Hammer of Wrath") && Api.Player.Auras.Contains("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath"))
+        else if (Api.Spellbook.CanCast("Hammer of Wrath") && Api.Player.Auras.Contains("Avenging Wrath") && !Api.Spellbook.OnCooldown("Avenging Wrath") && mana > 12)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Hammer of Wrath");
@@ -341,7 +341,7 @@ public class RetPalaWOTLK : Rotation
         }
 
 
-        if (Api.Spellbook.CanCast("Crusader Strike") && !Api.Spellbook.OnCooldown("Crusader Strike"))
+        if (Api.Spellbook.CanCast("Crusader Strike") && !Api.Spellbook.OnCooldown("Crusader Strike") && mana >8)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Crusader Strike");
@@ -351,7 +351,7 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Judgement") && mana > 15 && !Api.Spellbook.OnCooldown("Judgement") && !Api.Spellbook.OnCooldown("Judgement") && (me.Auras.Contains("Seal of Truth") || me.Auras.Contains("Seal of Righteousness") || me.Auras.Contains("Seal of Command")))
+        if (Api.Spellbook.CanCast("Judgement") && mana > 5 && !Api.Spellbook.OnCooldown("Judgement") && !Api.Spellbook.OnCooldown("Judgement") && (me.Auras.Contains("Seal of Truth") || me.Auras.Contains("Seal of Righteousness") || me.Auras.Contains("Seal of Command")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Judgement");
@@ -400,10 +400,25 @@ public class RetPalaWOTLK : Rotation
         var HolyPower = me.HolyPower;
 
 
-        Console.ForegroundColor = ConsoleColor.Red;
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine($"{mana}% Mana available");
         Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
         Console.WriteLine($"{HolyPower} HolyPower available");   // Insert your player stats logging using the new API
+
+        if (Api.Player.Auras.Contains("Seal of Truth"))
+        {
+            double timeRemaining = Api.Player.Auras.TimeRemaining("Seal of Truth");
+            int minutes = (int)(timeRemaining / 1000 / 60);
+            int seconds = (int)(timeRemaining / 1000 % 60);
+            Console.WriteLine($"Time remaining for Seal of Truth: {minutes} minutes and {seconds} seconds");
+        }
+        else
+        {
+            Console.WriteLine("Seal of Truth is not active.");
+        }
+
+        Console.ResetColor();
+
 
     }
 }
