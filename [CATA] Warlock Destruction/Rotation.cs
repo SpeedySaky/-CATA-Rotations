@@ -194,10 +194,10 @@ public class DestroLock : Rotation
         if (!IsValid(pet))
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Summon Imp.");
+            Console.WriteLine("Casting Summon Pet.");
             Console.ResetColor();
 
-            if (Api.Spellbook.Cast(688))
+            if (Api.UseMacro("Imp"))
             {
                 return true;
             }
@@ -279,6 +279,17 @@ public class DestroLock : Rotation
                 // Successfully assisted the pet, continue rotation
                 // Don't return true here, continue with the rest of the combat logic
                 // without triggering a premature exit
+            }
+        }
+        if (!IsValid(pet))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Summon Pet.");
+            Console.ResetColor();
+
+            if (Api.UseMacro("Imp"))
+            {
+                return true;
             }
         }
         if (Api.Spellbook.CanCast("Drain Soul") && Api.Inventory.ItemCount("Soul Shard") <= 1 && targethealth <= 20)
@@ -473,14 +484,7 @@ public class DestroLock : Rotation
         // Get the current count of Soul Shards in the inventory
         int soulShardCount = Api.Inventory.ItemCount("Soul Shard");
 
-        if (soulShardCount >= 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Current Soul Shard Count: " + soulShardCount); // Debugging line
-            Console.ResetColor();
-
-
-        }
+        
 
         if (!IsValid(pet))
         {
@@ -497,20 +501,8 @@ public class DestroLock : Rotation
             Console.ResetColor();
             // Additional actions for when the pet is dead
         }
-        if (Api.Spellbook.CanCast("Summon"))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Can Cast Summon Imp.");
-            Console.ResetColor();
-            // Additional actions for when the pet is dead
-        }
-        if (Api.Spellbook.CanCast(688))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Can Cast 688");
-            Console.ResetColor();
-            // Additional actions for when the pet is dead
-        }
+       // Additional actions for when the pet is dead
+       
         Console.ResetColor();
     }
 
