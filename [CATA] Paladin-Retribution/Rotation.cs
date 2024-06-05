@@ -229,7 +229,7 @@ public class RetPalaWOTLK : Rotation
         }
         CreatureType targetCreatureType = GetCreatureType(target);
 
-        if ((Api.Player.Auras.Contains(59578) || Api.Player.Auras.Contains(53489)) && Api.Spellbook.CanCast("Exorcism") && !Api.Spellbook.OnCooldown("Exorcism") )
+        if (Api.Player.Auras.Contains(59578) && Api.Spellbook.CanCast("Exorcism")) 
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Exorcism with Art of War");
