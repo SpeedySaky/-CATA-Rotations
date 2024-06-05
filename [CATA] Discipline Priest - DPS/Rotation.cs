@@ -127,13 +127,8 @@ public class PriestDiscoWOTLK : Rotation
 
         var reaction = me.GetReaction(target);
 
-        if (!target.IsDead() &&
-            (reaction != UnitReaction.Friendly &&
-             reaction != UnitReaction.Honored &&
-             reaction != UnitReaction.Revered &&
-             reaction != UnitReaction.Exalted) &&
-            mana > 20 && !IsNPC(target))
-            if (reaction != UnitReaction.Friendly)
+        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
+            if (Api.Spellbook.CanCast("Smite") && targetDistance > 5 && targetDistance < 30 && !Api.Spellbook.OnCooldown("Smite"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Smite");
