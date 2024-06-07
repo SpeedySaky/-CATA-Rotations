@@ -14,8 +14,9 @@ public class ProtWarr : Rotation
 
     private int debugInterval = 5; // Set the debug interval in seconds
     private DateTime lastDebugTime = DateTime.MinValue;
-    private DateTime lastRevengeTime = DateTime.MinValue;
-    private TimeSpan RevengeCooldown = TimeSpan.FromSeconds(10);
+    private DateTime RevengeCooldown = DateTime.MinValue;
+    private TimeSpan lastRevengeTime = TimeSpan.FromSeconds(10);
+
     private List<string> npcConditions = new List<string>
     {
         "Innkeeper", "Auctioneer", "Banker", "FlightMaster", "GuildBanker",
@@ -64,7 +65,7 @@ public class ProtWarr : Rotation
     {
         var me = Api.Player;
         var healthPercentage = me.HealthPercent;
-        var rage = me.Rage/10;
+        var rage = me.Rage / 10;
         var target = Api.Target;
         var targetDistance = target.Position.Distance2D(me.Position);
 
@@ -211,6 +212,18 @@ public class ProtWarr : Rotation
                 return true;
             }
         }
+        if (Api.Spellbook.CanCast("Revenge") && !Api.Spellbook.OnCooldown("Revenge") && rage >= 5 && (DateTime.Now - RevengeCooldown) >= lastRevengeTime)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Revenge");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Revenge"))
+                RevengeCooldown = DateTime.Now; // Update the last cast time
+
+            return true;
+
+        }
         if (Api.Spellbook.CanCast("Shield Block") && !Api.Spellbook.OnCooldown("Shield Block") && rage >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -218,9 +231,9 @@ public class ProtWarr : Rotation
             Console.ResetColor();
 
             if (Api.Spellbook.Cast("Shield Block"))
-            {
-                return true;
-            }
+
+            return true;
+
         }
 
         // Use Shield Wall on 2-minute cooldown to reduce damage taken during high damage raid mechanics
@@ -301,7 +314,7 @@ public class ProtWarr : Rotation
             }
         }
 
-      
+
 
 
         if (Api.Spellbook.CanCast("Rend") && !target.Auras.Contains("Rend"))
@@ -315,10 +328,10 @@ public class ProtWarr : Rotation
                 return true;
             }
         }
-      
-       
+
+
         // Use Thunder Clap on cooldown; spreads Rend via Blood and Thunder
-        if (Api.Spellbook.CanCast("Thunder Clap") && !Api.Spellbook.OnCooldown("Thunder Clap") && rage >= 20 && Api.UnfriendlyUnitsNearby(5, true)>=2)
+        if (Api.Spellbook.CanCast("Thunder Clap") && !Api.Spellbook.OnCooldown("Thunder Clap") && rage >= 20 && Api.UnfriendlyUnitsNearby(5, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Thunder Clap");
@@ -329,18 +342,7 @@ public class ProtWarr : Rotation
                 return true;
             }
         }
-        // Use Shield Slam on cooldown
-        if (Api.Spellbook.CanCast("Shield Slam") && !Api.Spellbook.OnCooldown("Shield Slam") && rage >= 20 )
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Shield Slam");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Shield Slam"))
-            {
-                return true;
-            }
-        }
+    
 
         if (Api.Spellbook.CanCast("Heroic Strike") && rage >= 80)
         {
@@ -366,7 +368,7 @@ public class ProtWarr : Rotation
         }
 
         // Use Devastate as a filler during the gaps in your rotation
-        if (Api.Spellbook.CanCast("Devastate") && rage >= 15 && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 3)) 
+        if (Api.Spellbook.CanCast("Devastate") && rage >= 15 && (!target.Auras.Contains("Sunder Armor") || target.Auras.GetStacks("Sunder Armor") < 3))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Devastate");
@@ -390,7 +392,7 @@ public class ProtWarr : Rotation
 
         }
         // Use Shockwave on cooldown
-        if (Api.Spellbook.CanCast("Shockwave") && !Api.Spellbook.OnCooldown("Shockwave") && rage >= 15 && Api.UnfriendlyUnitsNearby(5, true)>=2)
+        if (Api.Spellbook.CanCast("Shockwave") && !Api.Spellbook.OnCooldown("Shockwave") && rage >= 15 && Api.UnfriendlyUnitsNearby(5, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shockwave");
@@ -417,7 +419,7 @@ public class ProtWarr : Rotation
         }
 
         // Use Cleave for any additional Rage
-        if (Api.Spellbook.CanCast("Cleave") && rage >= 30 && Api.UnfriendlyUnitsNearby(5, true)>=2)
+        if (Api.Spellbook.CanCast("Cleave") && rage >= 30 && Api.UnfriendlyUnitsNearby(5, true) >= 2)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Cleave");
@@ -439,19 +441,9 @@ public class ProtWarr : Rotation
                 return true;
             }
         }
-      
 
-       if (Api.Spellbook.CanCast("Revenge") && !Api.Spellbook.OnCooldown("Revenge") && rage >= 5)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Revenge");
-            Console.ResetColor();
 
-            if (Api.Spellbook.Cast("Revenge"))
-            {
-                return true;
-            }
-        }
+
 
 
         return base.CombatPulse();
