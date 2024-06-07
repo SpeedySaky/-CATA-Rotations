@@ -273,6 +273,18 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        else
+        if (Api.Spellbook.CanCast("Seal of Righteousness") && !Api.Player.Auras.Contains("Seal of Truth") && mana > 14 && !Api.Player.Auras.Contains("Seal of Righteousness"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Seal of Righteousness");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Seal of Righteousness"))
+            {
+                return true;
+            }
+        }
 
         if (Api.UnfriendlyUnitsNearby(8, true) >= 2 && Api.Spellbook.CanCast("Consecration") && !!Api.Spellbook.OnCooldown("Consecration") && mana > 55)
         {
