@@ -175,7 +175,7 @@ public class RetPalaWOTLK : Rotation
         var targetHealth = Api.Target.HealthPercent;
         if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.IsMounted() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
-        if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60 %% mana >31)
+        if (Api.Spellbook.CanCast("Flash of Light")  && healthPercentage < 60 && mana >31)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Flash of Light");
