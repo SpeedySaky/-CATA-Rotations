@@ -7,7 +7,7 @@ using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
 
 
-public class PriestDiscoWOTLK : Rotation
+public class PriestDiscoCATA : Rotation
 {
     private bool HasItem(object item)
       => Api.Inventory.HasItem(item);
@@ -61,9 +61,12 @@ public class PriestDiscoWOTLK : Rotation
     {
         // Variables for player and target instances
         var me = Api.Player;
+        var target = Api.Target;
         var mana = me.ManaPercent;
         var healthPercentage = me.HealthPercent;
-
+        var targethealth = target.HealthPercent;
+        var targetDistance = target.Position.Distance2D(me.Position);
+		
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {
             LogPlayerStats();
@@ -113,7 +116,7 @@ public class PriestDiscoWOTLK : Rotation
                     return true;
                 }
             }
-            if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire"))
+           if (Api.Spellbook.CanCast("Inner Fire") && !Api.Player.Auras.Contains("Inner Fire", false))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Casting Inner Fire");
@@ -123,8 +126,6 @@ public class PriestDiscoWOTLK : Rotation
                     return true;
                 }
             }
-        var target = Api.Target;
-
         var reaction = me.GetReaction(target);
 
         if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) && !IsNPC(target))
@@ -215,7 +216,7 @@ public class PriestDiscoWOTLK : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Inner Fire") && !me.Auras.Contains("Inner Fire") && mana > 25)
+        if (Api.Spellbook.CanCast("Inner Fire") && !Api.Player.Auras.Contains("Inner Fire", false))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Inner Fire");
