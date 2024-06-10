@@ -42,34 +42,6 @@ public class RetPalaWOTLK : Rotation
 
     }
 
-    public override bool MountedPulse()
-    {
-        var me = Api.Player;
-        var healthPercentage = me.HealthPercent;
-        var mana = me.ManaPercent;
-
-        if (me.IsDead() || me.IsGhost()) return false;
-
-
-
-
-        if (Api.Spellbook.CanCast("Crusader Aura") && !Api.Player.Auras.Contains("Crusader Aura", false) && me.IsMounted())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Crusader Aura");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Crusader Aura"))
-            {
-                return true;
-            }
-        }
-        return base.MountedPulse();
-    }
-
-
-
-
     public override bool PassivePulse()
     {
         var me = Api.Player;
@@ -79,7 +51,7 @@ public class RetPalaWOTLK : Rotation
         var targetDistance = target.Position.Distance2D(me.Position);
 
 
-        if (!target.IsValid() || me.IsDead() || me.IsGhost() || me.IsCasting() || me.IsMoving() || me.IsChanneling() || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
+        if ( me.IsDead() || me.IsGhost() || me.IsCasting() ||  me.IsChanneling()  || me.Auras.Contains("Drink") || me.Auras.Contains("Food")) return false;
 
         if ((DateTime.Now - lastDebugTime).TotalSeconds >= debugInterval)
         {

@@ -158,7 +158,7 @@ public class WOTLKRogueNoStealth : Rotation
                 return true;
             }
         }
-        if (Api.Spellbook.CanCast("Evasion") && !me.Auras.Contains("Evasion") && Api.UnfriendlyUnitsNearby(15, true) >= 2 && !Api.Spellbook.OnCooldown("Evasion"))
+		if (Api.Spellbook.CanCast("Evasion") && !me.Auras.Contains("Evasion") && Api.UnfriendlyUnitsNearby(15, true) >= 2 && !Api.Spellbook.OnCooldown("Evasion"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Casting Evasion");
@@ -208,6 +208,15 @@ public class WOTLKRogueNoStealth : Rotation
             {
                 return true;
             }
+        }
+		if (Api.Spellbook.CanCast("Recuperate") && !me.Auras.Contains("Recuperate") && points >= 3)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Casting Recuperate");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Recuperate"))
+                return true;
         }
         if (Api.Spellbook.CanCast("Slice and Dice") && points >= 3 && !me.Auras.Contains("Slice and Dice") && energy >= 25)
         {
