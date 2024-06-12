@@ -159,7 +159,23 @@ public class BMhunterWOTLK : Rotation
 
                 return true;
         }
-        return base.PassivePulse();
+        if (!target.IsDead() && !IsNPC(target) && Api.Spellbook.CanCast("Hunter's Mark") && !target.Auras.Contains("Hunter's Mark") && healthPercentage > 50 && focus > 20 && PetHealth > 50)
+
+
+
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Mark");
+            Console.ResetColor();
+
+            if (Api.UseMacro("Mark"))
+            {
+                lastMarkLogTime = DateTime.Now; // Update the lastMarkTime after successful casting
+                return true;
+            }
+        }
+
+       return base.PassivePulse();
 
     }
 
@@ -365,7 +381,7 @@ public class BMhunterWOTLK : Rotation
         // Variables for player and target instances
         var me = Api.Player;
         var target = Api.Target;
-        var mana = me.ManaPercent;
+        var mana = me.FocusPercent;
         var pet = me.Pet();
         var PetHealth = 0.0f;
         if (IsValid(pet))
@@ -380,7 +396,7 @@ public class BMhunterWOTLK : Rotation
 
 
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{mana}% Mana available");
+        Console.WriteLine($"{mana}% Focus available");
         Console.WriteLine($"{healthPercentage}% Health available");
 
         Console.ResetColor();
