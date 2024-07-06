@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using wShadow.Warcraft.Classes;
 using wShadow.Warcraft.Defines;
 using wShadow.Warcraft.Managers;
-
+using wShadow.WowBots;
+using wShadow.WowBots.PartyInfo;
 
 public class RetPalaWOTLK : Rotation
 {
@@ -60,8 +61,6 @@ public class RetPalaWOTLK : Rotation
         }
 
 
-        
-
 
         if (Api.Spellbook.CanCast("Retribution Aura") && !Api.Player.Auras.Contains("Retribution Aura", false) && !me.IsMounted())
         {
@@ -97,24 +96,24 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-        if (Api.Spellbook.CanCast("Blessing of Might") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.Auras.Contains("Hand of Protection") && !Api.Player.Auras.Contains("Divine Protection") && !Api.Player.IsMounted())
+        if (Api.Spellbook.CanCast("Blessing of Kings") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Kings") && !Api.Player.Auras.Contains("Hand of Protection") && !Api.Player.Auras.Contains("Divine Protection") && !Api.Player.IsMounted())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Blessing of Kings");
+            Console.ResetColor();
+
+            if (Api.Spellbook.Cast("Blessing of Kings"))
+            {
+                return true;
+            }
+        }
+        else if (Api.Spellbook.CanCast("Blessing of Might") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Kings") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.IsMounted())
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Blessing of Might");
             Console.ResetColor();
 
             if (Api.Spellbook.Cast("Blessing of Might"))
-            {
-                return true;
-            }
-        }
-        else if (Api.Spellbook.CanCast("Blessing of Wisdom") && mana > 5 && !Api.Player.Auras.Contains("Blessing of Wisdom") && !Api.Player.Auras.Contains("Blessing of Might") && !Api.Player.IsMounted())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Casting Blessing of Wisdom");
-            Console.ResetColor();
-
-            if (Api.Spellbook.Cast("Blessing of Wisdom"))
             {
                 return true;
             }
@@ -375,6 +374,57 @@ public class RetPalaWOTLK : Rotation
 
         return false;
     }
+
+
+    public void BuffPartyMembers(PartyBot partyBotInstance)
+    {
+        if (Api.Spellbook.CanCast("Blessing of Kings") && Api.Player.ManaPercent > 5 && !Api.Player.IsMounted())
+        {
+            // Target and buff the leader
+            PartyBot.TargetLeader();
+            CastBuffOnTarget("Blessing of Kings");
+
+            // Target and buff the tank(s)
+            for (int i = 0; i < partyBotInstance.TankCount; i++)
+            {
+                PartyBot.TargetTank(i);
+                CastBuffOnTarget("Blessing of Kings");
+            }
+
+            // Target and buff the healer(s)
+            for (int i = 0; i < partyBotInstance.HealerCount; i++)
+            {
+                PartyBot.TargetHealer(i);
+                CastBuffOnTarget("Blessing of Kings");
+            }
+
+            // Target and buff the DPS members
+            for (int i = 0; i < partyBotInstance.DpsCount; i++)
+            {
+                PartyBot.TargetDps(i);
+                CastBuffOnTarget("Blessing of Kings");
+            }
+        }
+    }
+
+    private void CastBuffOnTarget(string spellName)
+    {
+        // Assuming there's a method to check if the current target already has the buff
+        // This is pseudocode and needs to be replaced with actual logic
+        if (!Api.Target.Auras.Contains(spellName))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Casting {spellName} on current target.");
+            Console.ResetColor();
+            Api.Spellbook.Cast(spellName);
+
+            // Add a delay to ensure the game registers the cast before moving on
+            Thread.Sleep(1000); // Adjust based on actual game behavior
+        }
+    }
+
+
+
     private void LogPlayerStats()
     {
         var me = Api.Player;
@@ -383,11 +433,55 @@ public class RetPalaWOTLK : Rotation
         var healthPercentage = me.HealthPercent;
         var HolyPower = me.HolyPower;
 
-
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{mana}% Mana available");
-        Console.WriteLine($"{healthPercentage}% Health available");   // Insert your player stats logging using the new API
-        Console.WriteLine($"{HolyPower} HolyPower available");   // Insert your player stats logging using the new API
+        Console.WriteLine($"{healthPercentage}% Health available");
+        Console.WriteLine($"{HolyPower} HolyPower available");
+        if (PartyBot.IsInParty)
+        {
+            Console.WriteLine($"Player is in a party. Party size: {PartyBot.MemberCount}");
+        }
+        else
+        {
+            Console.WriteLine("Player is not in a party.");
+        }
+
+        // Get the party leader
+        WowUnit leaderUnit = PartyBot.GetLeader();
+        if (leaderUnit != null)
+        {
+            Console.WriteLine($"Leader Name: {leaderUnit.Name}"); // Assuming WowUnit has a Name property
+        }
+
+        // Example for getting the first DPS, Tank, and Healer names
+        WowUnit dpsUnit = PartyBot.GetDpsUnit(0);
+        if (dpsUnit != null)
+        {
+            Console.WriteLine($"DPS Name: {dpsUnit.Name}"); // Assuming WowUnit has a Name property
+        }
+
+        WowUnit tankUnit = PartyBot.GetTankUnit(0);
+        if (tankUnit != null)
+        {
+            Console.WriteLine($"Tank Name: {tankUnit.Name}"); // Assuming WowUnit has a Name property
+        }
+
+        WowUnit healerUnit = PartyBot.GetHealerUnit(0);
+        if (healerUnit != null)
+        {
+            Console.WriteLine($"Healer Name: {healerUnit.Name}"); // Assuming WowUnit has a Name property
+        }
+
+        // If you need to list all party members
+        WowUnit[] memberUnits = PartyBot.GetMemberUnits();
+        if (memberUnits != null)
+        {
+            foreach (WowUnit member in memberUnits)
+            {
+                Console.WriteLine($"Member Name: {member.Name}"); // Assuming WowUnit has a Name property
+            }
+        }
 
     }
+
 }
