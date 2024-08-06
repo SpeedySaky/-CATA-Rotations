@@ -27,7 +27,7 @@ public class FireMage : Rotation
         }
         return true;
     }
-	private bool HasItem(EquipmentSlot slot)
+    private bool HasItem(EquipmentSlot slot)
     {
         return Api.Equipment.HasItem(slot);
     }
@@ -46,8 +46,8 @@ public class FireMage : Rotation
         // The simplest calculation for optimal ticks (to avoid key spam and false attempts)
 
         // Assuming wShadow is an instance of some class containing UnitRatings property
-        SlowTick = 1200;
-        FastTick = 400;
+        SlowTick = 1500;
+        FastTick = 1000;
 
         // You can also use this method to add to various action lists.
 
@@ -136,23 +136,33 @@ public class FireMage : Rotation
 
 
         if (target.IsValid())
-        { 
-        if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
-            mana > 20 && !IsNPC(target))
         {
-            if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast"))
+            if (!target.IsDead() && (reaction != UnitReaction.Friendly && reaction != UnitReaction.Honored && reaction != UnitReaction.Revered && reaction != UnitReaction.Exalted) &&
+                mana > 20 && !IsNPC(target))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Casting Pyroblast");
-                Console.ResetColor();
+                if (Api.Spellbook.CanCast("Frostfire Bolt") && !target.Auras.Contains("Frostfire Bolt"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Frostfire Bolt");
+                    Console.ResetColor();
 
-                if (Api.Spellbook.Cast("Pyroblast"))
-                    return true;
-            }
+                    if (Api.Spellbook.Cast("Frostfire Bolt"))
+                        return true;
+                }
+                else
+                if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Pyroblast");
+                    Console.ResetColor();
 
-            else
-            {
-                if (Api.Spellbook.CanCast("Frostbolt") && !target.Auras.Contains("Frostbolt") && !Api.Spellbook.OnCooldown("Frostbolt"))
+                    if (Api.Spellbook.Cast("Pyroblast"))
+                        return true;
+                }
+
+                else
+
+                    if (Api.Spellbook.CanCast("Frostbolt") && !target.Auras.Contains("Frostbolt") && !Api.Spellbook.OnCooldown("Frostbolt"))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Casting Frostbolt");
@@ -161,9 +171,21 @@ public class FireMage : Rotation
                     if (Api.Spellbook.Cast("Frostbolt"))
                         return true;
                 }
+
+                else
+
+                    if (Api.Spellbook.CanCast("Fireball"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Casting Fireball");
+                    Console.ResetColor();
+
+                    if (Api.Spellbook.Cast("Fireball"))
+                        return true;
+                }
+
             }
         }
-    }
         return base.PassivePulse();
 
     }
@@ -184,19 +206,38 @@ public class FireMage : Rotation
             lastDebugTime = DateTime.Now; // Update lastDebugTime
         }
 
-        if (Api.Spellbook.CanCast("Conjure Mana Gem") && !HasItem("Mana Gem"))
+        if (me.ManaPercent <= 50 && !Api.Inventory.OnCooldown("Mana Gem"))
         {
-            if (Api.Spellbook.Cast("Conjure Mana Gem"))
-            {
-                Console.WriteLine("Conjured Mana Gem.");
-                // Add further actions if needed after conjuring Mana Gem
-            }
+                if (HasItem("Mana Gem"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Using Mana Gem");
+                    Console.ResetColor();
+                    if (Api.Inventory.Use("Mana Gem"))
+                    {
+                        return true;
+                    }
+                }
+            
         }
+        if (Api.Spellbook.CanCast("Frost Nova") && targetDistance <= 8 && !Api.Spellbook.OnCooldown("Frost Nova"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Frost Nova");
+            Console.ResetColor();
 
+            if (Api.Spellbook.Cast("Frost Nova"))
+                return true;
+        }
+        if (Api.Spellbook.CanCast("Pyroblast") && me.Auras.Contains(48108) )
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Pyroblast");
+            Console.ResetColor();
 
-
-
-
+            if (Api.Spellbook.Cast("Pyroblast"))
+                return true;
+        }
         if (Api.Spellbook.CanCast("Mana Shield") && !Api.Spellbook.OnCooldown("Mana Shield") && healthPercentage <= 30)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -215,7 +256,7 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Evocation"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") && ( target.Auras.Contains("Living Bomb") || target.Auras.Contains("Pyroblast") || target.Auras.Contains("Ignite")))
+        if (Api.Spellbook.CanCast("Combustion") && !Api.Spellbook.OnCooldown("Combustion") && (target.Auras.Contains("Living Bomb") || target.Auras.Contains("Pyroblast") || target.Auras.Contains("Ignite")))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Combustion");
@@ -252,7 +293,15 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Living Bomb"))
                 return true;
         }
+        if (Api.Spellbook.CanCast("Frostfire Bolt") && !target.Auras.Contains("Frostfire Bolt"))
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Frostfire Bolt");
+            Console.ResetColor();
 
+            if (Api.Spellbook.Cast("Frostfire Bolt"))
+                return true;
+        }
         if (Api.Spellbook.CanCast("Pyroblast") && !target.Auras.Contains("Pyroblast") && !Api.Spellbook.OnCooldown("Pyroblast"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -262,8 +311,8 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Pyroblast"))
                 return true;
         }
-               
-        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast") )
+
+        if (Api.Spellbook.CanCast("Fire Blast") && !Api.Spellbook.OnCooldown("Fire Blast"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fire Blast");
@@ -272,7 +321,7 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Fire Blast"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Scorch")  && !Api.Spellbook.OnCooldown("Scorch"))
+        if (Api.Spellbook.CanCast("Scorch") && !Api.Spellbook.OnCooldown("Scorch"))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Scorch");
@@ -281,7 +330,7 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Scorch"))
                 return true;
         }
-        if (Api.Spellbook.CanCast("Fireball") && mana >= 19 )
+        if (Api.Spellbook.CanCast("Fireball") && mana >= 19)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Fireball");
@@ -300,9 +349,9 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Frostbolt"))
                 return true;
         }
-        bool hasRanged= HasItem(EquipmentSlot.Extra);
+        bool hasRanged = HasItem(EquipmentSlot.Extra);
 
-        if (Api.Spellbook.CanCast("Shoot") && hasRanged )
+        if (Api.Spellbook.CanCast("Shoot") && hasRanged)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Casting Shoot");
@@ -311,8 +360,8 @@ public class FireMage : Rotation
             if (Api.Spellbook.Cast("Shoot"))
                 return true;
         }
-		else
-		if (Api.Spellbook.CanCast("Auto Attack") && !hasRanged)
+        else
+        if (Api.Spellbook.CanCast("Auto Attack") && !hasRanged)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("No ranged weapon--going auto attack");

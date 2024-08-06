@@ -187,7 +187,17 @@ public class RetPalaWOTLK : Rotation
                 return true;
             }
         }
+        if (Api.Spellbook.CanCast("Inquisition") && !Api.Player.Auras.Contains("Inquisition") && HolyPower > 1)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Casting Inquisition");
+            Console.ResetColor();
 
+            if (Api.Spellbook.Cast("Inquisition"))
+            {
+                return true;
+            }
+        }
         if (Api.Player.Auras.Contains("Divine Protection") && healthPercentage <= 50 && Api.Spellbook.CanCast("Holy Light") && mana > 12) 
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -232,7 +242,7 @@ public class RetPalaWOTLK : Rotation
             }
         }
 
-
+        
         if (Api.Spellbook.CanCast("Seal of Truth") && !Api.Player.Auras.Contains("Seal of Truth") && mana > 14)
         {
             Console.ForegroundColor = ConsoleColor.Green;
