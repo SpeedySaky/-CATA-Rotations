@@ -251,10 +251,10 @@ public class CatDruid : Rotation
             if (Api.Spellbook.Cast("Berserk"))
                 return true;
         }
-        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast("Mangle") && me.Auras.Contains(768, false))
+        else if (me.Auras.Contains("Berserk") && Api.Spellbook.CanCast(33876) && me.Auras.Contains(768, false))
         {
             Print($"Casting Mangle", ConsoleColor.Green);
-            if (Api.Spellbook.Cast("Mangle"))
+            if (Api.Spellbook.Cast(33876))
                 return true;
         }
 
@@ -295,10 +295,10 @@ public class CatDruid : Rotation
         if (Api.Spellbook.CanCast(33876) && comboPoints < 5 && energy >= 35 && !target.Auras.Contains(33876) && me.Auras.Contains(768, false))
         {
             Print($"Casting Mangle  with {energy} Energy", ConsoleColor.Green);
-            if (Api.Spellbook.Cast(33876))
+            if (Api.UseMacro("Mangle"))
                 return true;
         }
-
+       
         if (Api.Spellbook.CanCast("Claw") && energy >= 45 && me.Auras.Contains(768, false))
         {
             Print($"Casting Claw with {energy} Energy", ConsoleColor.Green);
